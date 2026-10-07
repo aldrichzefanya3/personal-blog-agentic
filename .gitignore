@@ -25,15 +25,14 @@
 *.pem
 
 # debug
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
 # env files — ignore all variants that may contain real secrets
-.env
-.env.local
-.env.*.local
+.env*
 # explicitly keep the example file so new contributors know what to configure
 !.env.example
 

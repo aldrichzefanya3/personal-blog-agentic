@@ -1,4 +1,4 @@
-import { sql } from './src/lib/db/client.ts';
+import { sql } from '../src/lib/db/client.ts';
 
 async function testSitemap() {
   try {
