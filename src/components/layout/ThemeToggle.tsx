@@ -2,29 +2,24 @@
 
 import React from 'react';
 
-/**
- * ThemeToggle component - toggles dark mode based on prefers-color-scheme
- * Note: Since we're using Tailwind's darkMode: 'media', this component provides
- * a manual override capability by toggling the 'dark' class on the document element.
- */
 export function ThemeToggle() {
-  const [isDark, setIsDark] = React.useState(() => {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+  const [isDark, setIsDark] = React.useState(false);
 
   React.useEffect(() => {
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const storedTheme = window.localStorage.getItem('theme');
+
+    const applyTheme = (dark: boolean) => {
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.classList.toggle('light', !dark);
+      setIsDark(dark);
+    };
+
+    applyTheme(storedTheme ? storedTheme === 'dark' : darkModeMediaQuery.matches);
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setIsDark(e.matches);
-      if (e.matches) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+      if (!window.localStorage.getItem('theme')) {
+        applyTheme(e.matches);
       }
     };
 
@@ -35,12 +30,9 @@ export function ThemeToggle() {
   const toggleTheme = () => {
     const newIsDark = !isDark;
     setIsDark(newIsDark);
-
-    if (newIsDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    window.localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark', newIsDark);
+    document.documentElement.classList.toggle('light', !newIsDark);
   };
 
   return (
@@ -48,6 +40,8 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-cyan-200 hover:bg-cyan-50 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-cyan-400/60 dark:hover:bg-slate-800 dark:focus:ring-cyan-400"
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-pressed={isDark}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       type="button"
     >
       {isDark ? (

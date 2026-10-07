@@ -167,8 +167,7 @@
      DARK MODE COLOR MAPPINGS
      Optimized for readability and WCAG AA compliance
      ============================================ */
-  @media (prefers-color-scheme: dark) {
-    :root {
+   :root.dark {
       /* Backgrounds — darker, less saturated */
       --color-background: var(--color-neutral-950);
       --color-background-secondary: var(--color-neutral-900);
@@ -200,6 +199,5 @@
       /* Code blocks */
       --color-code-bg: var(--color-neutral-900);
       --color-code-text: var(--color-primary-300);
-    }
   }
 }

@@ -77,8 +77,15 @@ export function buildCSP(nonce: string): string {
 export async function proxy(request: NextRequest) {
   // Start building the response — we need it early to set cookies from the
   // Supabase SSR library when a token refresh occurs.
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const contentSecurityPolicy = buildCSP(nonce);
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-nonce', nonce);
+    requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
+
+    // Forward the nonce and policy so Next.js can apply the nonce during rendering.
   const response = NextResponse.next({
-    request,
+      request: { headers: requestHeaders },
   });
 
   // -------------------------------------------------------------------------
@@ -98,7 +105,7 @@ export async function proxy(request: NextRequest) {
     console.warn(
       '[proxy] Missing SUPABASE_URL / SUPABASE_ANON_KEY — skipping session refresh.',
     );
-    return applySecurityHeaders(response, request);
+    return applySecurityHeaders(response, nonce, contentSecurityPolicy);
   }
 
   const isProduction = process.env.NODE_ENV === 'production';
@@ -140,14 +147,18 @@ export async function proxy(request: NextRequest) {
     if (!user) {
       const loginUrl = new URL('/auth/login', request.url);
       loginUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
-      return NextResponse.redirect(loginUrl);
+      return applySecurityHeaders(
+        NextResponse.redirect(loginUrl),
+        nonce,
+        contentSecurityPolicy,
+      );
     }
   }
 
   // -------------------------------------------------------------------------
   // 3. Set security headers (Req 15.1–15.5, 15.8)
   // -------------------------------------------------------------------------
-  return applySecurityHeaders(response, request);
+  return applySecurityHeaders(response, nonce, contentSecurityPolicy);
 }
 
 /**
@@ -157,19 +168,18 @@ export async function proxy(request: NextRequest) {
  */
 function applySecurityHeaders(
   response: NextResponse,
-  request: NextRequest,
+    nonce: string,
+    contentSecurityPolicy: string,
 ): NextResponse {
   // Generate a fresh per-request nonce.  crypto.randomUUID() is available in
   // the Node.js runtime and the Edge runtime.
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
 
   // Pass the nonce downstream so Server Components can use it for inline
   // scripts/styles (set as a request header so it is available via headers()).
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
 
   // Req 15.1 — Content-Security-Policy with per-request nonce.
-  response.headers.set('Content-Security-Policy', buildCSP(nonce));
+    response.headers.set('Content-Security-Policy', contentSecurityPolicy);
   // Req 15.2 — Prevent clickjacking.
   response.headers.set('X-Frame-Options', 'DENY');
   // Req 15.3 — Prevent MIME-type sniffing.

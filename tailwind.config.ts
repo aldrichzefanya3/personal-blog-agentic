@@ -2,8 +2,8 @@ import type { Config } from 'tailwindcss';
 import tailwindTypography from '@tailwindcss/typography';
 
 const config: Config = {
-  // Dark mode based on system preference (prefers-color-scheme media query)
-  darkMode: 'media',
+  // Dark mode is controlled by the root .dark class.
+  darkMode: 'class',
 
   // Content paths covering all components and pages
   content: [

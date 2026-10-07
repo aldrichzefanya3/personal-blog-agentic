@@ -10,6 +10,8 @@
 /* Import Animation Library */
 @import '../styles/animations.css';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   /* ============================================
      BASE STYLES
@@ -141,10 +143,8 @@
     color: var(--color-text);
   }
 
-  @media (prefers-color-scheme: dark) {
-    ::selection {
-      background: var(--color-primary-800);
-      color: var(--color-text);
-    }
+  html.dark ::selection {
+    background: var(--color-primary-800);
+    color: var(--color-text);
   }
 }

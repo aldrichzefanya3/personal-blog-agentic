@@ -6,7 +6,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 shadow-[0_10px_30px_rgba(15,23,42,0.04)] backdrop-blur-xl transition-shadow duration-200 dark:border-slate-700/80 dark:bg-slate-950/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between gap-4">
+        <div className="flex min-h-20 flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 md:h-20 md:flex-nowrap md:py-0">
           <div className="flex min-w-0 items-center gap-3">
             <Link
               href="/"
@@ -48,8 +48,8 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            <div className="w-52 sm:w-64 lg:w-72">
+          <div className="flex w-full items-center gap-2 sm:gap-3 md:ml-auto md:w-auto">
+            <div className="min-w-0 flex-1 md:w-52 md:flex-none lg:w-72">
               <SearchBar />
             </div>
             <ThemeToggle />
