@@ -25,7 +25,6 @@ export type Action =
  *
  * - ADMIN: full access to all 11 actions
  * - EDITOR: post/category/tag/media operations, but not user management or settings
- * - USER: no admin actions (empty set)
  */
 export const ROLE_PERMISSIONS: Record<UserRole, Set<Action>> = {
   ADMIN: new Set([
@@ -49,7 +48,6 @@ export const ROLE_PERMISSIONS: Record<UserRole, Set<Action>> = {
     'tag:write',
     'media:upload',
   ]),
-  USER: new Set(),
 };
 
 /**

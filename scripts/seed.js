@@ -75,14 +75,13 @@ async function seedDatabase() {
     
     console.log('\n✅ Seed complete!\n');
     console.log('📊 Seeded data:');
-    console.log(`   • ${users[0].count} users (admin, editor, user)`);
+    console.log(`   • ${users[0].count} users (admin and editor)`);
     console.log(`   • ${posts[0].count} posts (2 published, 1 draft)`);
     console.log(`   • ${categories[0].count} categories`);
     console.log(`   • ${tags[0].count} tags`);
     console.log('\n🔐 Test accounts:');
     console.log('   • admin@example.com (ADMIN role)');
     console.log('   • editor@example.com (EDITOR role)');
-    console.log('   • user@example.com (USER role)');
     console.log('\n⚠️  Note: These accounts use placeholder passwords and cannot be used for login.');
     console.log('   Sign up through your app to create real accounts.');
     

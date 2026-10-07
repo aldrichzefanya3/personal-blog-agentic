@@ -26,14 +26,6 @@ export function Footer() {
                   About
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/admin"
-                  className="text-slate-600 transition-colors hover:text-cyan-700 focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:outline-none dark:text-slate-300 dark:hover:text-cyan-300"
-                >
-                  Admin
-                </Link>
-              </li>
             </ul>
           </nav>
         </div>

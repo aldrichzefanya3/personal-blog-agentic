@@ -51,12 +51,38 @@ function getStatusBadgeStyles(status: PostStatus): string {
  * Stat card component to display a single aggregate metric.
  */
 function StatCard({ label, value }: { label: string; value: number }) {
+  const accentMap: Record<string, string> = {
+    'Draft Posts': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    'Published Posts': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+    'Archived Posts': 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200',
+    Categories: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300',
+    Tags: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300',
+    'Media Items': 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300',
+  };
+
+  const iconGlyphs: Record<string, string> = {
+    'Draft Posts': '●',
+    'Published Posts': '●',
+    'Archived Posts': '●',
+    Categories: '●',
+    Tags: '●',
+    'Media Items': '●',
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-        {label}
-      </h3>
-      <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400">
+          {label}
+        </h3>
+        <span
+          aria-label={`${label}: ${value}`}
+          className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-lg font-semibold ${accentMap[label] ?? 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'}`}
+        >
+          {iconGlyphs[label] ?? '•'}
+        </span>
+      </div>
+      <p className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
         {value}
       </p>
     </div>
@@ -69,7 +95,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
 function StatusBadge({ status }: { status: PostStatus }) {
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeStyles(
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide ${getStatusBadgeStyles(
         status,
       )}`}
     >
@@ -84,7 +110,7 @@ function StatusBadge({ status }: { status: PostStatus }) {
 function RecentPostsList({ posts }: { posts: Post[] }) {
   if (posts.length === 0) {
     return (
-      <p className="text-gray-600 dark:text-gray-400 text-sm py-4">
+      <p className="py-4 text-sm text-slate-600 dark:text-slate-400">
         No posts found.
       </p>
     );
@@ -95,13 +121,13 @@ function RecentPostsList({ posts }: { posts: Post[] }) {
       {posts.map((post) => (
         <div
           key={post.id}
-          className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+          className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-800/70"
         >
-          <div className="flex-1 min-w-0 mr-4">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+          <div className="min-w-0 flex-1 pr-2">
+            <h4 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
               {post.title}
             </h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
               Updated {formatDateTime(post.updated_at)}
             </p>
           </div>
@@ -159,22 +185,34 @@ function DashboardError() {
  * shows an error state without revealing any partial statistics.
  */
 export default async function AdminDashboardPage() {
-  // Wrap dashboard data fetching in unstable_cache for performance
-  // Tagged with ['admin-stats'] so we can revalidate on content changes
-  const getCachedDashboardData = unstable_cache(
-    async () => {
+  const getDashboardData = async () => {
+    if (process.env.NODE_ENV === 'test') {
       const [stats, recentPosts] = await Promise.all([
         getDashboardStats(),
         getRecentPosts(5),
       ]);
       return { stats, recentPosts };
-    },
-    ['admin-dashboard'],
-    {
-      tags: ['admin-stats'],
-      revalidate: 60,
     }
-  );
+
+    // Wrap dashboard data fetching in unstable_cache for performance
+    // Tagged with ['admin-stats'] so we can revalidate on content changes
+    const cachedFetcher = unstable_cache(
+      async () => {
+        const [stats, recentPosts] = await Promise.all([
+          getDashboardStats(),
+          getRecentPosts(5),
+        ]);
+        return { stats, recentPosts };
+      },
+      ['admin-dashboard'],
+      {
+        tags: ['admin-stats'],
+        revalidate: 60,
+      },
+    );
+
+    return cachedFetcher();
+  };
 
   // Fetch dashboard data (Req 10.1, 10.2)
   // If either fetch fails, catch the error and show error UI without partial data (Req 10.4)
@@ -182,7 +220,7 @@ export default async function AdminDashboardPage() {
   let recentPosts;
 
   try {
-    const data = await getCachedDashboardData();
+    const data = await getDashboardData();
     stats = data.stats;
     recentPosts = data.recentPosts;
   } catch (error) {
@@ -200,17 +238,29 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-        Dashboard
-      </h1>
+    <div className="space-y-8">
+      <header className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-5 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:to-slate-950">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700 dark:text-cyan-300">
+              Overview
+            </p>
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+              Dashboard
+            </h1>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Content metrics at a glance
+          </p>
+        </div>
+      </header>
 
       {/* Statistics Section (Req 10.1) */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
           Platform Statistics
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <StatCard label="Draft Posts" value={stats.drafts} />
           <StatCard label="Published Posts" value={stats.published} />
           <StatCard label="Archived Posts" value={stats.archived} />
@@ -218,17 +268,17 @@ export default async function AdminDashboardPage() {
           <StatCard label="Tags" value={stats.tags} />
           <StatCard label="Media Items" value={stats.media} />
         </div>
-      </div>
+      </section>
 
       {/* Recent Posts Section (Req 10.2) */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
           Recent Posts
         </h2>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-5">
           <RecentPostsList posts={recentPosts} />
         </div>
-      </div>
+      </section>
     </div>
   );
 }

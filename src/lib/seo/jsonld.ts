@@ -11,7 +11,7 @@ export function buildBlogPostingJsonLd(
   post: PostWithRelations,
   url: string,
 ): object {
-  const authorName = post.author.display_name || 'Anonymous';
+  const authorName = post.author?.display_name || 'Former contributor';
   const description = post.excerpt || post.title;
 
   return {

@@ -74,7 +74,7 @@ describe('requireRole', () => {
     const mockSession: SessionUser = {
       id: 'user-456',
       email: 'user@example.com',
-      role: 'USER',
+      role: 'EDITOR',
       display_name: 'Regular User',
       bio: null,
       avatar_url: null,
@@ -92,7 +92,7 @@ describe('requireRole', () => {
     });
 
     expect(rolesModule.isAuthorized).toHaveBeenCalledWith(
-      'USER',
+      'EDITOR',
       'post:create',
     );
   });
@@ -224,7 +224,7 @@ describe('requireOwnership', () => {
     const mockSession: SessionUser = {
       id: 'user-123',
       email: 'user@example.com',
-      role: 'USER',
+      role: 'EDITOR',
       display_name: 'Regular User',
       bio: null,
       avatar_url: null,

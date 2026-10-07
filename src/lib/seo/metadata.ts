@@ -66,7 +66,7 @@ export async function generatePostMetadata(
   const ogImage = post.cover_image_url || `${siteUrl}${DEFAULT_OG_IMAGE}`;
 
   // Author name for metadata
-  const authorName = post.author.display_name || 'Anonymous';
+  const authorName = post.author?.display_name || 'Former contributor';
 
   return {
     title,

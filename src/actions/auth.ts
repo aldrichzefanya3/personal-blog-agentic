@@ -13,7 +13,7 @@
  * Req 8.11 — Failed auth uses generic message, locks after 5 failures in 10 min
  * Req 9.1  — One-time admin signup flow with secret token
  * Req 9.2  — Role-based login with server-side verification
- * Req 9.4  — RBAC enforcement (unauthorized USER role blocked from admin panel)
+ * Req 9.4  — RBAC enforcement (only ADMIN and EDITOR accounts may log in)
  * Req 9.9  — Role always comes from public.users.role (database source of truth)
  * Req 15.6 — Clear CSRF token on logout
  * Req 17.1 — Environment validation for ADMIN_SIGNUP_SECRET
@@ -25,8 +25,8 @@ import { createSupabaseServerClient } from '@/lib/auth/supabase-server';
 import { clearCsrfToken } from '@/lib/csrf';
 import { hasAdminUser } from '@/lib/auth/admin-check';
 import { createClient } from '@supabase/supabase-js';
-import { updateUserRole } from '@/lib/db/queries/users';
-import { getUserById } from '@/lib/db/queries/users';
+import { generateAnonymousDisplayName, getUserById } from '@/lib/db/queries/users';
+import { getServerSession } from '@/lib/auth/session';
 import type { UserRole } from '@/types/database';
 
 /**
@@ -89,7 +89,7 @@ function validatePassword(password: string): {
  * - The authoritative role always comes from public.users.role (database)
  * - This server-side check prevents client-side role manipulation
  * - This check is SEPARATE from and happens BEFORE existing RBAC guards
- * - USER role accounts are explicitly blocked from admin panel access
+ * - Only ADMIN and EDITOR roles are accepted by the login flow
  *
  * @param formData - Form data containing email, password, role, and optional redirectTo
  * @returns Error object if authentication fails, otherwise redirects
@@ -142,14 +142,6 @@ export async function loginAction(formData: FormData) {
 
   // STEP 3: Verify selected role matches database role (Req 9.2, 9.4)
   // Defense-in-depth: multiple layers ensure proper access control
-  if (user.role === 'USER') {
-    // USER role accounts exist but are explicitly blocked from admin panel access
-    await supabase.auth.signOut();
-    return {
-      error: 'Please contact the administrator for admin panel access',
-    };
-  }
-
   if (selectedRole === 'ADMIN' && user.role !== 'ADMIN') {
     // User selected Admin but database role is not ADMIN
     await supabase.auth.signOut();
@@ -277,6 +269,29 @@ export async function updatePasswordAction(formData: FormData) {
   );
 }
 
+/** Allows an authenticated account to choose a new password from its profile. */
+export async function changeMyPassword(password: string) {
+  const session = await getServerSession();
+
+  if (!session) {
+    return { error: 'Authentication required' };
+  }
+
+  const validation = validatePassword(password);
+  if (!validation.valid) {
+    return { error: validation.error };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: 'Failed to update password. Please try again.' };
+  }
+
+  return { success: 'Password updated successfully.' };
+}
+
 /**
  * One-time admin signup action (Req 8.1, 8.10, 9.1, 17.1, 17.3)
  *
@@ -289,7 +304,7 @@ export async function updatePasswordAction(formData: FormData) {
  * - Secret must be communicated out-of-band to the blog owner
  * - Route returns 404 after first admin exists (defense-in-depth)
  * - Uses service-role client to create user with email_confirm: true
- * - Updates public.users to set role = 'ADMIN'
+ * - Sets trusted app metadata so the database trigger creates the ADMIN profile
  *
  * @param formData - Form data containing email, password, and secret
  * @returns Success message or error object
@@ -352,24 +367,13 @@ export async function adminSignupAction(formData: FormData) {
       email,
       password,
       email_confirm: true,
+      app_metadata: { managed_role: 'ADMIN' },
+      user_metadata: { display_name: generateAnonymousDisplayName() },
     });
 
   if (createError || !userData.user) {
     return {
       error: `Failed to create admin account: ${createError?.message ?? 'Unknown error'}`,
-    };
-  }
-
-  // Update the user's role in public.users to 'ADMIN'
-  try {
-    await updateUserRole(userData.user.id, 'ADMIN');
-  } catch (error) {
-    // If role update fails, the user exists but is not an admin
-    // This is a partial failure state — log and return error
-    console.error('Failed to set admin role:', error);
-    return {
-      error:
-        'Admin account created but role assignment failed. Contact system administrator.',
     };
   }
 

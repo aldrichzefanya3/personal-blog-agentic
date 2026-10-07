@@ -4,7 +4,7 @@
  * These tests verify that the admin layout correctly:
  * - Calls getServerSession() to verify authentication
  * - Redirects to /auth/login when no session exists
- * - Redirects to /auth/login when role is 'USER'
+ * - Redirects to /auth/login when role is unsupported
  * - Renders the Sidebar with the user's role
  * - Renders the main content slot
  *
@@ -20,7 +20,9 @@ import type { SessionUser } from '@/lib/auth/session';
 
 // Mock Next.js navigation
 vi.mock('next/navigation', () => ({
-  redirect: vi.fn(),
+  redirect: vi.fn((path: string) => {
+    throw new Error(`NEXT_REDIRECT:${path}`);
+  }),
   usePathname: vi.fn(() => '/admin'),
 }));
 
@@ -39,15 +41,17 @@ describe('AdminLayout', () => {
     vi.mocked(getServerSession).mockResolvedValue(null);
 
     // Act: Render the layout
-    await AdminLayout({ children: <div>Test Content</div> });
+    await expect(AdminLayout({ children: <div>Test Content</div> })).rejects.toThrow(
+      'NEXT_REDIRECT:/auth/login',
+    );
 
     // Assert: Should redirect to login
     expect(redirect).toHaveBeenCalledWith('/auth/login');
   });
 
-  it('redirects to /auth/login with error when role is USER (Req 9.4)', async () => {
-    // Arrange: Session with USER role
-    const userSession: SessionUser = {
+  it('redirects to /auth/login with error when role is unsupported (Req 9.4)', async () => {
+    // Arrange: Session with a non-supported role value
+    const userSession = {
       id: 'user-123',
       email: 'user@example.com',
       role: 'USER',
@@ -55,11 +59,13 @@ describe('AdminLayout', () => {
       bio: null,
       avatar_url: null,
       created_at: new Date().toISOString(),
-    };
+    } as unknown as SessionUser;
     vi.mocked(getServerSession).mockResolvedValue(userSession);
 
     // Act: Render the layout
-    await AdminLayout({ children: <div>Test Content</div> });
+    await expect(AdminLayout({ children: <div>Test Content</div> })).rejects.toThrow(
+      'NEXT_REDIRECT:/auth/login?error=insufficient_permissions',
+    );
 
     // Assert: Should redirect to login with error parameter
     expect(redirect).toHaveBeenCalledWith('/auth/login?error=insufficient_permissions');
@@ -152,7 +158,7 @@ describe('AdminLayout', () => {
     // Assert: Content should be in a main element
     const main = document.querySelector('main');
     expect(main).toBeInTheDocument();
-    expect(main).toHaveClass('flex-1', 'p-8');
+    expect(main).toHaveClass('flex-1', 'p-4', 'sm:p-6', 'lg:p-8');
     expect(main).toContainHTML('Test Content');
   });
 

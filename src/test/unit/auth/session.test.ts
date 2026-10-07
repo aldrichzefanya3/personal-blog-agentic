@@ -203,7 +203,7 @@ describe('getServerSession', () => {
     };
     const mockDbUser = {
       id: 'user-789',
-      role: 'USER' as const,
+      role: 'EDITOR' as const,
       display_name: null,
       bio: null,
       avatar_url: null,
@@ -231,7 +231,7 @@ describe('getServerSession', () => {
     expect(result).toEqual<SessionUser>({
       id: 'user-789',
       email: 'minimal@example.com',
-      role: 'USER',
+      role: 'EDITOR',
       display_name: null,
       bio: null,
       avatar_url: null,
@@ -247,7 +247,7 @@ describe('getServerSession', () => {
     };
     const mockDbUser = {
       id: 'user-no-email',
-      role: 'USER' as const,
+      role: 'EDITOR' as const,
       display_name: 'No Email User',
       bio: null,
       avatar_url: null,

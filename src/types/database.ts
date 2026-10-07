@@ -2,7 +2,7 @@
 // Core database row types derived from the PostgreSQL schema (Requirements 6.1–6.7)
 
 export type PostStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-export type UserRole = 'ADMIN' | 'EDITOR' | 'USER';
+export type UserRole = 'ADMIN' | 'EDITOR';
 
 export interface Post {
   id: string; // UUID
@@ -11,7 +11,7 @@ export interface Post {
   excerpt: string | null;
   content: string | null;
   cover_image_url: string | null;
-  author_id: string; // UUID → users.id
+  author_id: string | null; // UUID → users.id; null when the account was removed
   status: PostStatus;
   published_at: string | null; // ISO 8601
   created_at: string;
@@ -19,7 +19,7 @@ export interface Post {
 }
 
 export interface PostWithRelations extends Post {
-  author: Pick<User, 'id' | 'display_name' | 'avatar_url'>;
+  author: Pick<User, 'id' | 'display_name' | 'avatar_url'> | null;
   categories: Category[];
   tags: Tag[];
 }
@@ -49,7 +49,7 @@ export interface User {
 
 export interface Media {
   id: string;
-  uploader_id: string;
+  uploader_id: string | null;
   filename: string;
   storage_path: string;
   mime_type: string;

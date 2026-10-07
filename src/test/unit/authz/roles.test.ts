@@ -41,8 +41,8 @@ const EDITOR_DENIED_ACTIONS: Action[] = [
 ];
 
 describe('ROLE_PERMISSIONS', () => {
-  it('defines permissions for all three roles', () => {
-    const roles: UserRole[] = ['ADMIN', 'EDITOR', 'USER'];
+  it('defines permissions for both supported roles', () => {
+    const roles: UserRole[] = ['ADMIN', 'EDITOR'];
     for (const role of roles) {
       expect(ROLE_PERMISSIONS).toHaveProperty(role);
       expect(ROLE_PERMISSIONS[role]).toBeInstanceOf(Set);
@@ -82,9 +82,6 @@ describe('ROLE_PERMISSIONS', () => {
     }
   });
 
-  it('USER has empty permissions set', () => {
-    expect(ROLE_PERMISSIONS['USER'].size).toBe(0);
-  });
 });
 
 describe('isAuthorized()', () => {
@@ -126,18 +123,6 @@ describe('isAuthorized()', () => {
 
     it('is NOT authorized for settings:manage (Req 9.1)', () => {
       expect(isAuthorized('EDITOR', 'settings:manage')).toBe(false);
-    });
-  });
-
-  // USER
-  describe('USER role', () => {
-    it('is NOT authorized for any action (Req 9.4)', () => {
-      for (const action of ALL_ACTIONS) {
-        expect(
-          isAuthorized('USER', action),
-          `USER must not be authorized for: ${action}`,
-        ).toBe(false);
-      }
     });
   });
 

@@ -5,10 +5,10 @@
  * Subtask 17.3 - Requirements 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.8, 11.9, 11.10, 11.11
  */
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { MarkdownEditor } from './MarkdownEditor';
-import type { Post, Category, Tag, PostStatus } from '@/types/database';
+import type { Post, Category, Tag } from '@/types/database';
 import { generateSlug } from '@/lib/slug';
 
 interface PostFormProps {
@@ -52,13 +52,6 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
     Record<string, string>
   >({});
 
-  // Auto-generate slug from title when title changes (unless manually edited)
-  useEffect(() => {
-    if (!slugManuallyEdited && title) {
-      setSlug(generateSlug(title));
-    }
-  }, [title, slugManuallyEdited]);
-
   // Client-side validation
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -86,7 +79,8 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
       !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) &&
       slug !== generateSlug(title)
     ) {
-      errors.slug = 'Slug must contain only lowercase letters, numbers, and hyphens';
+      errors.slug =
+        'Slug must contain only lowercase letters, numbers, and hyphens';
     }
 
     setValidationErrors(errors);
@@ -115,7 +109,8 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
 
     startTransition(async () => {
       try {
-        const actionFn = action === 'create' ? actions.createPost : actions.updatePost;
+        const actionFn =
+          action === 'create' ? actions.createPost : actions.updatePost;
         if (!actionFn) {
           setError('Action not available');
           return;
@@ -171,12 +166,13 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
   };
 
   const handleDelete = async () => {
-    if (!post || !actions.deletePost) return;
+    const deletePost = actions.deletePost;
+    if (!post || !deletePost) return;
 
     setError(null);
     startTransition(async () => {
       try {
-        const result = await actions.deletePost(post.id);
+        const result = await deletePost(post.id);
         if (result.error) {
           setError(result.error);
           setShowDeleteConfirm(false);
@@ -197,7 +193,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {/* Title */}
         <div>
           <label
@@ -210,9 +206,14 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
             type="text"
             id="title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            onChange={(e) => {
+              const nextTitle = e.target.value;
+              setTitle(nextTitle);
+              if (!slugManuallyEdited) setSlug(generateSlug(nextTitle));
+            }}
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 transition outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-cyan-900"
             placeholder="Enter post title"
+            maxLength={255}
           />
           {validationErrors.title && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -237,138 +238,15 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
               setSlug(e.target.value);
               setSlugManuallyEdited(true);
             }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-mono text-sm text-slate-900 transition outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-cyan-900"
             placeholder="auto-generated-from-title"
+            maxLength={255}
           />
           {validationErrors.slug && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">
               {validationErrors.slug}
             </p>
           )}
-        </div>
-
-        {/* Excerpt */}
-        <div>
-          <label
-            htmlFor="excerpt"
-            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Excerpt (max 500 characters)
-          </label>
-          <textarea
-            id="excerpt"
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            rows={3}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-            placeholder="Brief description of the post"
-          />
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {excerpt.length}/500
-          </p>
-          {validationErrors.excerpt && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {validationErrors.excerpt}
-            </p>
-          )}
-        </div>
-
-        {/* Cover Image URL */}
-        <div>
-          <label
-            htmlFor="coverImageUrl"
-            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Cover Image URL
-          </label>
-          <input
-            type="url"
-            id="coverImageUrl"
-            value={coverImageUrl}
-            onChange={(e) => setCoverImageUrl(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-            placeholder="https://example.com/image.jpg"
-          />
-          {validationErrors.coverImageUrl && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {validationErrors.coverImageUrl}
-            </p>
-          )}
-        </div>
-
-        {/* Categories */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Categories
-          </label>
-          <div className="space-y-2 rounded-md border border-gray-300 p-3 dark:border-gray-700">
-            {categories.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                No categories available
-              </p>
-            ) : (
-              categories.map((category) => (
-                <label key={category.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategoryIds.includes(category.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedCategoryIds([
-                          ...selectedCategoryIds,
-                          category.id,
-                        ]);
-                      } else {
-                        setSelectedCategoryIds(
-                          selectedCategoryIds.filter((id) => id !== category.id),
-                        );
-                      }
-                    }}
-                    className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {category.name}
-                  </span>
-                </label>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Tags
-          </label>
-          <div className="space-y-2 rounded-md border border-gray-300 p-3 dark:border-gray-700">
-            {tags.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                No tags available
-              </p>
-            ) : (
-              tags.map((tag) => (
-                <label key={tag.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedTagIds.includes(tag.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedTagIds([...selectedTagIds, tag.id]);
-                      } else {
-                        setSelectedTagIds(
-                          selectedTagIds.filter((id) => id !== tag.id),
-                        );
-                      }
-                    }}
-                    className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {tag.name}
-                  </span>
-                </label>
-              ))
-            )}
-          </div>
         </div>
 
         {/* Markdown Editor */}
@@ -378,17 +256,147 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
             {validationErrors.content}
           </p>
         )}
+
+        {/* Excerpt */}
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label
+              htmlFor="excerpt"
+              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Excerpt (max 500 characters)
+            </label>
+            <textarea
+              id="excerpt"
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+              rows={3}
+              maxLength={500}
+              className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 transition outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-cyan-900"
+              placeholder="Brief description of the post"
+            />
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {excerpt.length}/500
+            </p>
+            {validationErrors.excerpt && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {validationErrors.excerpt}
+              </p>
+            )}
+          </div>
+
+          {/* Cover Image URL */}
+          <div>
+            <label
+              htmlFor="coverImageUrl"
+              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Cover Image URL
+            </label>
+            <input
+              type="url"
+              id="coverImageUrl"
+              value={coverImageUrl}
+              onChange={(e) => setCoverImageUrl(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 transition outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-cyan-900"
+              placeholder="https://example.com/image.jpg"
+            />
+            {validationErrors.coverImageUrl && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {validationErrors.coverImageUrl}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Categories and tags */}
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Categories
+            </label>
+            <div className="max-h-56 space-y-2 overflow-y-auto rounded-lg border border-slate-300 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+              {categories.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No categories available
+                </p>
+              ) : (
+                categories.map((category) => (
+                  <label key={category.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedCategoryIds.includes(category.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedCategoryIds([
+                            ...selectedCategoryIds,
+                            category.id,
+                          ]);
+                        } else {
+                          setSelectedCategoryIds(
+                            selectedCategoryIds.filter(
+                              (id) => id !== category.id,
+                            ),
+                          );
+                        }
+                      }}
+                      className="mr-2 h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-2 focus:ring-cyan-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {category.name}
+                    </span>
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Tags
+            </label>
+            <div className="max-h-56 space-y-2 overflow-y-auto rounded-lg border border-slate-300 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+              {tags.length === 0 ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No tags available
+                </p>
+              ) : (
+                tags.map((tag) => (
+                  <label key={tag.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedTagIds.includes(tag.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedTagIds([...selectedTagIds, tag.id]);
+                        } else {
+                          setSelectedTagIds(
+                            selectedTagIds.filter((id) => id !== tag.id),
+                          );
+                        }
+                      }}
+                      className="mr-2 h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-2 focus:ring-cyan-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {tag.name}
+                    </span>
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-3 border-t border-gray-300 pt-6 dark:border-gray-700">
+      <div className="sticky bottom-0 z-20 -mx-4 flex flex-wrap items-center gap-2 border-t border-slate-200 bg-white/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-sm backdrop-blur sm:mx-0 sm:rounded-lg sm:px-3 dark:border-slate-800 dark:bg-slate-950/95">
         {/* Primary Actions */}
         {!post && actions.createPost && (
           <button
             type="button"
             onClick={() => handleSubmit('create')}
             disabled={isPending}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="min-h-10 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 disabled:opacity-50 dark:bg-cyan-400 dark:text-slate-950 dark:hover:bg-cyan-300"
           >
             {isPending ? 'Creating...' : 'Create Draft'}
           </button>
@@ -399,7 +407,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
             type="button"
             onClick={() => handleSubmit('update')}
             disabled={isPending}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="min-h-10 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500 disabled:opacity-50 dark:bg-cyan-400 dark:text-slate-950 dark:hover:bg-cyan-300"
           >
             {isPending ? 'Saving...' : 'Save Changes'}
           </button>
@@ -411,7 +419,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
             type="button"
             onClick={() => handleStatusChange('publish')}
             disabled={isPending}
-            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+            className="min-h-10 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100 disabled:opacity-50 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200 dark:hover:bg-emerald-950/70"
           >
             Publish
           </button>
@@ -422,7 +430,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
             type="button"
             onClick={() => handleStatusChange('unpublish')}
             disabled={isPending}
-            className="rounded-md bg-yellow-600 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-700 disabled:opacity-50"
+            className="min-h-10 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 transition hover:bg-amber-100 disabled:opacity-50 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200 dark:hover:bg-amber-950/70"
           >
             Unpublish
           </button>
@@ -433,7 +441,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
             type="button"
             onClick={() => handleStatusChange('archive')}
             disabled={isPending}
-            className="rounded-md bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+            className="min-h-10 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
           >
             Archive
           </button>
@@ -447,7 +455,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={isPending}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                className="min-h-10 rounded-lg border border-rose-300 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-800 transition hover:bg-rose-100 disabled:opacity-50 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-200 dark:hover:bg-rose-950/70"
               >
                 Delete
               </button>
@@ -457,7 +465,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
                   type="button"
                   onClick={handleDelete}
                   disabled={isPending}
-                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                  className="min-h-10 rounded-lg border border-rose-300 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-800 transition hover:bg-rose-100 disabled:opacity-50 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-200 dark:hover:bg-rose-950/70"
                 >
                   {isPending ? 'Deleting...' : 'Confirm Delete'}
                 </button>
@@ -465,7 +473,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
                   type="button"
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isPending}
-                  className="rounded-md bg-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-400 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300"
+                  className="min-h-10 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Cancel
                 </button>
@@ -479,7 +487,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
           type="button"
           onClick={() => router.push('/admin/posts')}
           disabled={isPending}
-          className="ml-auto rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300"
+          className="ml-auto min-h-10 rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:opacity-50 dark:text-slate-300 dark:hover:bg-slate-800"
         >
           Back to Posts
         </button>
@@ -489,9 +497,7 @@ export function PostForm({ post, categories, tags, actions }: PostFormProps) {
         <div className="text-sm text-gray-500 dark:text-gray-400">
           <p>Status: {post.status}</p>
           {post.published_at && (
-            <p>
-              Published: {new Date(post.published_at).toLocaleDateString()}
-            </p>
+            <p>Published: {new Date(post.published_at).toLocaleDateString()}</p>
           )}
           <p>Updated: {new Date(post.updated_at).toLocaleString()}</p>
         </div>

@@ -12,7 +12,9 @@ INSERT INTO auth.users (
   created_at,
   updated_at,
   aud,
-  role
+  role,
+  raw_app_meta_data,
+  raw_user_meta_data
 )
 VALUES
   (
@@ -23,7 +25,9 @@ VALUES
     now(),
     now(),
     'authenticated',
-    'authenticated'
+    'authenticated',
+    '{"managed_role":"ADMIN"}'::jsonb,
+    '{"display_name":"Alice Admin"}'::jsonb
   ),
   (
     '00000000-0000-0000-0000-000000000002'::uuid,
@@ -33,17 +37,9 @@ VALUES
     now(),
     now(),
     'authenticated',
-    'authenticated'
-  ),
-  (
-    '00000000-0000-0000-0000-000000000003'::uuid,
-    'user@example.com',
-    '$2a$10$placeholderHashForSeedDataOnlyDoNotUseInProduction0003',
-    now(),
-    now(),
-    now(),
     'authenticated',
-    'authenticated'
+    '{"managed_role":"EDITOR"}'::jsonb,
+    '{"display_name":"Edward Editor"}'::jsonb
   )
 ON CONFLICT (id) DO NOTHING;
 
@@ -51,37 +47,25 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================
 -- PUBLIC.USERS
 -- ============================================================
-
-INSERT INTO public.users (
-  id,
-  role,
-  display_name,
-  bio,
-  avatar_url
-)
-VALUES
-  (
-    '00000000-0000-0000-0000-000000000001'::uuid,
-    'ADMIN',
-    'Alice Admin',
-    'Platform administrator with full access to all features.',
-    'https://example.com/avatars/alice.webp'
-  ),
-  (
-    '00000000-0000-0000-0000-000000000002'::uuid,
-    'EDITOR',
-    'Edward Editor',
-    'Content editor responsible for reviewing and publishing posts.',
-    'https://example.com/avatars/edward.webp'
-  ),
-  (
-    '00000000-0000-0000-0000-000000000003'::uuid,
-    'USER',
-    'Uma User',
-    'Regular reader with no admin panel access.',
-    NULL
-  )
-ON CONFLICT (id) DO NOTHING;
+UPDATE public.users
+SET bio = CASE id
+      WHEN '00000000-0000-0000-0000-000000000001'::uuid
+        THEN 'Platform administrator with full access to all features.'
+      WHEN '00000000-0000-0000-0000-000000000002'::uuid
+        THEN 'Content editor responsible for reviewing and publishing posts.'
+      ELSE bio
+    END,
+    avatar_url = CASE id
+      WHEN '00000000-0000-0000-0000-000000000001'::uuid
+        THEN 'https://example.com/avatars/alice.webp'
+      WHEN '00000000-0000-0000-0000-000000000002'::uuid
+        THEN 'https://example.com/avatars/edward.webp'
+      ELSE avatar_url
+    END
+WHERE id IN (
+  '00000000-0000-0000-0000-000000000001'::uuid,
+  '00000000-0000-0000-0000-000000000002'::uuid
+);
 
 
 -- ============================================================

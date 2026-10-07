@@ -102,20 +102,26 @@ export function CategoryList({ categories: initialCategories }: CategoryListProp
   };
 
   return (
-    <div className="space-y-4">
-      {/* Error display */}
+    <div className="space-y-6">
       {error && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
-          <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 shadow-sm dark:border-red-900/80 dark:bg-red-950/60 dark:text-red-200">
+          {error}
         </div>
       )}
 
-      {/* Create new category form */}
-      <div className="rounded-md border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-        <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Create New Category
-        </h2>
-        <form onSubmit={handleCreate} className="flex gap-2">
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-700 dark:text-violet-300">
+              Manage
+            </p>
+            <h2 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
+              Create New Category
+            </h2>
+          </div>
+        </div>
+
+        <form onSubmit={handleCreate} className="flex flex-col gap-3 sm:flex-row">
           <input
             type="text"
             name="name"
@@ -125,131 +131,184 @@ export function CategoryList({ categories: initialCategories }: CategoryListProp
             maxLength={100}
             required
             disabled={isPending}
-            className="flex-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400 dark:disabled:bg-gray-800"
+            className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:bg-slate-100 disabled:text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-violet-400 dark:focus:bg-slate-900"
           />
           <button
             type="submit"
             disabled={isPending || !newCategoryName.trim()}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed dark:bg-blue-500 dark:hover:bg-blue-600 dark:disabled:bg-gray-600"
+            className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-slate-300 dark:bg-violet-500 dark:hover:bg-violet-400 dark:disabled:bg-slate-700"
           >
             {isPending ? 'Creating...' : 'Create'}
           </button>
         </form>
-      </div>
+      </section>
 
-      {/* Categories list */}
-      <div className="rounded-md border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
         {categories.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               No categories yet. Create your first category above.
             </p>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-                >
-                  Name
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-                >
-                  Slug
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-                >
-                  Created
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+          <>
+            <div className="hidden overflow-x-auto md:block">
+              <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                <thead className="bg-slate-50 dark:bg-slate-800/80">
+                  <tr>
+                    <th scope="col" className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      Name
+                    </th>
+                    <th scope="col" className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      Slug
+                    </th>
+                    <th scope="col" className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      Created
+                    </th>
+                    <th scope="col" className="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-900">
+                  {categories.map((category) => (
+                    <tr key={category.id} className="transition hover:bg-slate-50 dark:hover:bg-slate-800/70">
+                      <td className="px-5 py-4">
+                        {editingId === category.id ? (
+                          <input
+                            type="text"
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            maxLength={100}
+                            disabled={isPending}
+                            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-100"
+                          />
+                        ) : (
+                          <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                            {category.name}
+                          </div>
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
+                        {category.slug}
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
+                        {new Date(category.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm font-medium">
+                        {editingId === category.id ? (
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleUpdate(category.id)}
+                              disabled={isPending || !editingName.trim()}
+                              className="rounded-lg px-2.5 py-1.5 text-green-600 transition hover:bg-green-50 hover:text-green-700 disabled:cursor-not-allowed disabled:text-slate-400 dark:text-green-400 dark:hover:bg-green-950/40 dark:hover:text-green-300"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              disabled={isPending}
+                              className="rounded-lg px-2.5 py-1.5 text-slate-600 transition hover:bg-slate-100 hover:text-slate-800 disabled:cursor-not-allowed disabled:text-slate-400 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex justify-end gap-3">
+                            <button
+                              onClick={() => startEdit(category)}
+                              disabled={isPending}
+                              className="text-violet-600 transition hover:text-violet-700 disabled:text-slate-400 dark:text-violet-400 dark:hover:text-violet-300"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(category.id, category.name)}
+                              disabled={isPending}
+                              className="text-red-600 transition hover:text-red-700 disabled:text-slate-400 dark:text-red-400 dark:hover:text-red-300"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="space-y-3 p-3 md:hidden">
               {categories.map((category) => (
-                <tr key={category.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="px-6 py-4">
-                    {editingId === category.id ? (
-                      <input
-                        type="text"
-                        value={editingName}
-                        onChange={(e) => setEditingName(e.target.value)}
-                        maxLength={100}
-                        disabled={isPending}
-                        className="w-full rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400 dark:disabled:bg-gray-800"
-                      />
-                    ) : (
-                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {category.name}
-                      </div>
-                    )}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {category.slug}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(category.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                    {editingId === category.id ? (
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleUpdate(category.id)}
-                          disabled={isPending || !editingName.trim()}
-                          className="text-green-600 hover:text-green-900 disabled:text-gray-400 disabled:cursor-not-allowed dark:text-green-400 dark:hover:text-green-300 dark:disabled:text-gray-600"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={cancelEdit}
+                <div key={category.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800/70">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        Name
+                      </p>
+                      {editingId === category.id ? (
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          maxLength={100}
                           disabled={isPending}
-                          className="text-gray-600 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed dark:text-gray-400 dark:hover:text-gray-300 dark:disabled:text-gray-600"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => startEdit(category)}
-                          disabled={isPending}
-                          className="text-blue-600 hover:text-blue-900 disabled:text-gray-400 disabled:cursor-not-allowed dark:text-blue-400 dark:hover:text-blue-300 dark:disabled:text-gray-600"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(category.id, category.name)}
-                          disabled={isPending}
-                          className="text-red-600 hover:text-red-900 disabled:text-gray-400 disabled:cursor-not-allowed dark:text-red-400 dark:hover:text-red-300 dark:disabled:text-gray-600"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
+                          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                        />
+                      ) : (
+                        <p className="mt-1 break-words text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          {category.name}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex shrink-0 gap-2 text-sm font-medium">
+                      {editingId === category.id ? (
+                        <>
+                          <button onClick={() => handleUpdate(category.id)} disabled={isPending || !editingName.trim()} className="text-green-600 dark:text-green-400">
+                            Save
+                          </button>
+                          <button onClick={cancelEdit} disabled={isPending} className="text-slate-600 dark:text-slate-300">
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => startEdit(category)} disabled={isPending} className="text-violet-600 dark:text-violet-400">
+                            Edit
+                          </button>
+                          <button onClick={() => handleDelete(category.id, category.name)} disabled={isPending} className="text-red-600 dark:text-red-400">
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        Slug
+                      </p>
+                      <p className="mt-1 break-all text-slate-700 dark:text-slate-300">{category.slug}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        Created
+                      </p>
+                      <p className="mt-1 text-slate-700 dark:text-slate-300">
+                        {new Date(category.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </>
         )}
       </div>
 
-      {/* Info text */}
-      <div className="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
-        <p className="text-sm text-blue-800 dark:text-blue-200">
-          <strong>Note:</strong> Slugs are automatically generated from category names.
-          Deleting a category will remove it from all posts but will not delete the posts themselves.
-        </p>
+      <div className="rounded-2xl border border-violet-200 bg-violet-50 p-4 text-sm text-violet-900 dark:border-violet-900/80 dark:bg-violet-950/40 dark:text-violet-200">
+        <strong className="font-semibold">Note:</strong> Slugs are automatically generated from category names. Deleting a category will remove it from all posts but will not delete the posts themselves.
       </div>
     </div>
   );

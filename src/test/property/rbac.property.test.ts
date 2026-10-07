@@ -13,7 +13,7 @@ import { isAuthorized, ROLE_PERMISSIONS, type Action } from '@/lib/authz/roles';
 const allActions: Action[] = Array.from(ROLE_PERMISSIONS['ADMIN']) as Action[];
 
 /**
- * Actions that are ADMIN-only (not available to EDITOR or USER).
+ * Actions that are ADMIN-only (not available to EDITOR).
  */
 const adminOnlyActions: Action[] = allActions.filter(
   (action) => !ROLE_PERMISSIONS['EDITOR'].has(action),
@@ -23,25 +23,11 @@ const adminOnlyActions: Action[] = allActions.filter(
  * Property 6: RBAC — Role Permission Invariant
  *
  * For any action in the system:
- *   - USER returns false for all actions
  *   - EDITOR returns false for ADMIN-only actions
  *
  * This invariant holds regardless of the order in which permissions are checked.
  */
 describe('CP-6: RBAC — Role Permission Invariant', () => {
-  /**
-   * **Validates: Requirements 9.1, 9.2, 9.3, 9.5**
-   *
-   * Property 6a: USER role is denied every action without exception.
-   */
-  it('Property 6a: USER is denied every action (Req 9.1, 9.2, 9.3, 9.5)', () => {
-    fc.assert(
-      fc.property(fc.constantFrom(...allActions), (action) => {
-        return isAuthorized('USER', action) === false;
-      }),
-    );
-  });
-
   /**
    * **Validates: Requirements 9.1, 9.2, 9.3, 9.5**
    *
@@ -67,18 +53,16 @@ describe('CP-6: RBAC — Role Permission Invariant', () => {
       fc.property(fc.constantFrom(...allActions), (action) => {
         const adminSizeBefore = ROLE_PERMISSIONS['ADMIN'].size;
         const editorSizeBefore = ROLE_PERMISSIONS['EDITOR'].size;
-        const userSizeBefore = ROLE_PERMISSIONS['USER'].size;
 
         // Call multiple times in different orders
-        const r1 = isAuthorized('USER', action);
+        const r1 = isAuthorized('EDITOR', action);
         const r2 = isAuthorized('EDITOR', action);
-        const r3 = isAuthorized('USER', action);
+        const r3 = isAuthorized('EDITOR', action);
 
         return (
-          r1 === r3 && // deterministic for USER
+          r1 === r3 &&
           ROLE_PERMISSIONS['ADMIN'].size === adminSizeBefore &&
           ROLE_PERMISSIONS['EDITOR'].size === editorSizeBefore &&
-          ROLE_PERMISSIONS['USER'].size === userSizeBefore &&
           r2 !== undefined // EDITOR result is defined
         );
       }),

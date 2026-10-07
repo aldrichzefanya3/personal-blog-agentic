@@ -4,7 +4,7 @@
  * Requirements: 9.1, 9.3
  *
  * Req 9.1 — Only ADMIN users can access this page (enforced via requireRole)
- * Req 9.3 — Provides UI to promote/demote user roles
+ * Req 9.3 — Allows the sole ADMIN to create and remove EDITOR accounts
  */
 
 import { requireRole } from '@/lib/authz/guards';
@@ -25,7 +25,7 @@ import { UserManagementTable } from './user-management-table';
 export default async function SettingsPage() {
   // Step 1: Verify caller has ADMIN role (Req 9.1)
   // This throws AuthError('FORBIDDEN', 403) if unauthorized
-  await requireRole('user:manage');
+  const session = await requireRole('user:manage');
 
   // Step 2: Fetch all users (Req 9.3)
   const users = await getAllUsers();
@@ -38,12 +38,12 @@ export default async function SettingsPage() {
           User Management
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Manage user roles and permissions
+          Create editor accounts and manage existing accounts
         </p>
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <UserManagementTable users={users} />
+        <UserManagementTable users={users} currentUserId={session.id} />
       </div>
     </div>
   );

@@ -192,7 +192,7 @@ export default async function PostPage(props: PostPageProps) {
 
             <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-5 text-sm text-slate-200 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                {post.author.avatar_url ? (
+                {post.author?.avatar_url ? (
                   <Image
                     src={post.author.avatar_url}
                     alt={post.author.display_name || 'Author'}
@@ -202,7 +202,7 @@ export default async function PostPage(props: PostPageProps) {
                   />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/10 text-sm font-semibold text-white">
-                    {(post.author.display_name || 'Author')
+                    {(post.author?.display_name || 'Former contributor')
                       .split(' ')
                       .map((value) => value[0])
                       .join('')
@@ -211,7 +211,7 @@ export default async function PostPage(props: PostPageProps) {
                   </div>
                 )}
                 <div>
-                  <p className="font-semibold text-white">{post.author.display_name || 'Anonymous'}</p>
+                  <p className="font-semibold text-white">{post.author?.display_name || 'Former contributor'}</p>
                   {publishedDate && (
                     <time dateTime={publishedDate} className="text-slate-300">
                       {publishedDate}

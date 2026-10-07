@@ -102,7 +102,7 @@ export function FeaturedPostCard({ post }: FeaturedPostCardProps) {
 
           <div className="mt-auto flex items-center justify-between gap-4 border-t border-slate-200 pt-5 dark:border-slate-700">
             <div className="flex items-center gap-3">
-              {post.author.avatar_url ? (
+              {post.author?.avatar_url ? (
                 <Image
                   src={post.author.avatar_url}
                   alt=""
@@ -112,12 +112,12 @@ export function FeaturedPostCard({ post }: FeaturedPostCardProps) {
                 />
               ) : (
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                  {(post.author.display_name || 'A').slice(0, 1).toUpperCase()}
+                  {(post.author?.display_name || 'F').slice(0, 1).toUpperCase()}
                 </span>
               )}
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                  {post.author.display_name || 'Anonymous'}
+                  {post.author?.display_name || 'Former contributor'}
                 </span>
                 <time dateTime={post.published_at || undefined} className="text-xs text-slate-500 dark:text-slate-400">
                   {formattedDate}

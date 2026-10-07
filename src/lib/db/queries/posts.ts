@@ -21,7 +21,7 @@ interface PostRow {
   excerpt: string | null;
   content: string | null;
   cover_image_url: string | null;
-  author_id: string;
+  author_id: string | null;
   status: string;
   published_at: string | null;
   created_at: string;
@@ -51,11 +51,13 @@ function mapPostRow(row: PostRow): PostWithRelations {
     published_at: row.published_at,
     created_at: row.created_at,
     updated_at: row.updated_at,
-    author: {
-      id: row.author_id,
-      display_name: row.author_display_name,
-      avatar_url: row.author_avatar_url,
-    },
+    author: row.author_id
+      ? {
+          id: row.author_id,
+          display_name: row.author_display_name,
+          avatar_url: row.author_avatar_url,
+        }
+      : null,
     // json_agg returns parsed JSON arrays directly via postgres.js
     categories: (row.categories ?? []).map((c) => ({
       id: c.id,
@@ -103,7 +105,7 @@ export async function getPublishedPosts(opts: {
           '[]'
         ) AS tags
       FROM public.posts p
-      JOIN public.users u ON u.id = p.author_id
+      LEFT JOIN public.users u ON u.id = p.author_id
       LEFT JOIN public.post_categories pc ON pc.post_id = p.id
       LEFT JOIN public.categories c ON c.id = pc.category_id
       LEFT JOIN public.post_tags pt ON pt.post_id = p.id
@@ -153,7 +155,7 @@ export async function getPostBySlug(
         '[]'
       ) AS tags
     FROM public.posts p
-    JOIN public.users u ON u.id = p.author_id
+    LEFT JOIN public.users u ON u.id = p.author_id
     LEFT JOIN public.post_categories pc ON pc.post_id = p.id
     LEFT JOIN public.categories c ON c.id = pc.category_id
     LEFT JOIN public.post_tags pt ON pt.post_id = p.id
@@ -194,7 +196,7 @@ export async function getPublishedPostsByCategory(opts: {
           '[]'
         ) AS tags
       FROM public.posts p
-      JOIN public.users u ON u.id = p.author_id
+      LEFT JOIN public.users u ON u.id = p.author_id
       JOIN public.post_categories pc_filter ON pc_filter.post_id = p.id
       JOIN public.categories c_filter ON c_filter.id = pc_filter.category_id
         AND c_filter.slug = ${opts.categorySlug}
@@ -257,7 +259,7 @@ export async function getPublishedPostsByTag(opts: {
           '[]'
         ) AS tags
       FROM public.posts p
-      JOIN public.users u ON u.id = p.author_id
+      LEFT JOIN public.users u ON u.id = p.author_id
       JOIN public.post_tags pt_filter ON pt_filter.post_id = p.id
       JOIN public.tags t_filter ON t_filter.id = pt_filter.tag_id
         AND t_filter.slug = ${opts.tagSlug}
@@ -326,7 +328,7 @@ export async function searchPosts(opts: {
         (p.content ILIKE ${pattern})::int
       ) AS relevance
     FROM public.posts p
-    JOIN public.users u ON u.id = p.author_id
+    LEFT JOIN public.users u ON u.id = p.author_id
     LEFT JOIN public.post_categories pc ON pc.post_id = p.id
     LEFT JOIN public.categories c ON c.id = pc.category_id
     LEFT JOIN public.post_tags pt ON pt.post_id = p.id
@@ -390,7 +392,7 @@ export async function getPostByIdWithRelations(
         '[]'
       ) AS tags
     FROM public.posts p
-    JOIN public.users u ON u.id = p.author_id
+    LEFT JOIN public.users u ON u.id = p.author_id
     LEFT JOIN public.post_categories pc ON pc.post_id = p.id
     LEFT JOIN public.categories c ON c.id = pc.category_id
     LEFT JOIN public.post_tags pt ON pt.post_id = p.id

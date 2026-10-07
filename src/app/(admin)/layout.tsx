@@ -5,8 +5,8 @@
  * authentication and authorization checks before rendering admin content.
  *
  * Defense-in-depth: While middleware already redirects unauthenticated requests,
- * this layout adds an additional server-side check and blocks USER role accounts
- * from accessing admin content.
+ * this layout adds an additional server-side check and only allows the two
+ * supported roles to access admin content.
  *
  * CSRF Token Initialization: The CsrfTokenInitializer client component runs on
  * mount to generate the CSRF token via a Server Action. This is necessary because
@@ -15,7 +15,7 @@
  * Requirements: 8.9, 9.4, 10.3, 15.6
  *
  * Req 8.9  — Session verified server-side before rendering admin content
- * Req 9.4  — USER role blocked from /admin/** routes (403 response)
+ * Req 9.4  — Only ADMIN and EDITOR roles may access /admin/** routes
  * Req 10.3 — Dashboard available to ADMIN and EDITOR roles
  * Req 15.6 — CSRF token generated and stored in non-HttpOnly cookie
  */
@@ -37,7 +37,7 @@ interface AdminLayoutProps {
  * 1. If no session exists → redirect to /auth/login (defense-in-depth,
  *    middleware should have already caught this)
  *
- * 2. If session exists but role is 'USER' → redirect to /auth/login with
+ * 2. If session has an unsupported role → redirect to /auth/login with
  *    an error message (Req 9.4)
  *
  * 3. Initialize CSRF token for the session (Req 15.6)
@@ -57,19 +57,18 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     redirect('/auth/login');
   }
 
-  // Step 3: Block USER role from accessing admin panel (Req 9.4)
-  if (session.role === 'USER') {
-    // Redirect to login with an error parameter indicating insufficient permissions
+  // Step 3: Ensure the session role is one of the supported roles (Req 9.4)
+  if (session.role !== 'ADMIN' && session.role !== 'EDITOR') {
     redirect('/auth/login?error=insufficient_permissions');
   }
 
   // Step 4: Render admin layout for ADMIN and EDITOR roles
   // Note: CSRF token is initialized by CsrfTokenInitializer client component
   return (
-    <div className="flex min-h-screen bg-white dark:bg-gray-950">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950 lg:flex-row">
       <CsrfTokenInitializer />
       <Sidebar role={session.role} />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
         {children}
       </main>
     </div>

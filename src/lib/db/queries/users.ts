@@ -1,7 +1,12 @@
 // User query functions — Requirements 9.9, 9.10, 16.1, 16.2
 
+import { randomBytes } from 'node:crypto';
 import { sql } from '@/lib/db/client';
-import type { User, UserRole } from '@/types/database';
+import type { User } from '@/types/database';
+
+export function generateAnonymousDisplayName(): string {
+  return `Anonymous-${randomBytes(4).toString('hex')}`;
+}
 
 /**
  * Returns the public.users row for the given id, or null if not found.
@@ -29,27 +34,6 @@ export async function getAllUsers(): Promise<User[]> {
     ORDER BY created_at ASC
   `;
   return rows;
-}
-
-/**
- * Updates the role of a single user and returns the updated row.
- * Only ADMIN users may call this (enforced at the route/authz layer).
- * The value is passed as a parameterized bind, never concatenated. (Req 16.1, 16.2)
- */
-export async function updateUserRole(
-  id: string,
-  role: UserRole,
-): Promise<User> {
-  const rows = await sql<User[]>`
-    UPDATE public.users
-    SET role = ${role}
-    WHERE id = ${id}
-    RETURNING id, role, display_name, bio, avatar_url, created_at
-  `;
-  if (rows.length === 0) {
-    throw new Error(`User not found: ${id}`);
-  }
-  return rows[0];
 }
 
 /**

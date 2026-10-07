@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Sidebar } from '@/components/admin/Sidebar';
 
 // Mock Next.js navigation
@@ -79,7 +79,7 @@ describe('Sidebar', () => {
 
     // Assert: Posts link should have active styling
     const postsLink = screen.getByText('Posts').closest('a');
-    expect(postsLink).toHaveClass('bg-gray-200', 'dark:bg-gray-800');
+    expect(postsLink).toHaveClass('bg-slate-200', 'dark:bg-slate-800');
   });
 
   it('does not highlight inactive routes', () => {
@@ -91,8 +91,8 @@ describe('Sidebar', () => {
 
     // Assert: Posts link should NOT have active styling
     const postsLink = screen.getByText('Posts').closest('a');
-    expect(postsLink).not.toHaveClass('bg-gray-200');
-    expect(postsLink).toHaveClass('text-gray-700', 'dark:text-gray-300');
+    expect(postsLink).not.toHaveClass('bg-slate-200');
+    expect(postsLink).toHaveClass('text-slate-700', 'dark:text-slate-300');
   });
 
   it('renders navigation links with correct href attributes', () => {
@@ -115,10 +115,20 @@ describe('Sidebar', () => {
     // Assert: Should use aside and nav elements
     const aside = document.querySelector('aside');
     expect(aside).toBeInTheDocument();
-    expect(aside).toHaveClass('w-64', 'bg-gray-50', 'dark:bg-gray-900');
+    expect(aside).toHaveClass('w-full', 'bg-slate-50/80', 'dark:bg-slate-950/80');
 
     const nav = document.querySelector('nav');
     expect(nav).toBeInTheDocument();
+  });
+
+  it('uses responsive layout classes for tablet and mobile screens', () => {
+    // Arrange & Act
+    render(<Sidebar role="ADMIN" />);
+
+    // Assert: Sidebar should stack properly on small screens and keep width on large screens
+    const aside = document.querySelector('aside');
+    expect(aside).toHaveClass('w-full', 'lg:w-64', 'lg:border-r');
+    expect(aside).toHaveClass('border-b', 'border-slate-200', 'lg:border-b-0');
   });
 
   it('applies responsive styling for light and dark modes', () => {
@@ -128,21 +138,34 @@ describe('Sidebar', () => {
     // Assert: Should have light/dark mode classes
     const aside = document.querySelector('aside');
     expect(aside).toHaveClass(
-      'bg-gray-50',
-      'dark:bg-gray-900',
-      'border-r',
-      'border-gray-200',
-      'dark:border-gray-800'
+      'bg-slate-50/80',
+      'dark:bg-slate-950/80',
+      'border-b',
+      'border-slate-200',
+      'dark:border-slate-800',
+      'lg:border-r',
+      'lg:border-b-0'
     );
   });
 
-  it('handles USER role (should not reach this point due to layout guard, but safe fallback)', () => {
-    // Arrange & Act: Render with USER role
-    render(<Sidebar role="USER" />);
+  it('renders a mobile menu toggle and allows expanding/collapsing the nav on smaller screens', () => {
+    // Arrange & Act
+    render(<Sidebar role="ADMIN" />);
 
-    // Assert: Common items should still render (layout blocks access before this)
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    // Settings should not be visible
-    expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+    const toggleButton = screen.getByRole('button', { name: /expand admin menu/i });
+    const nav = document.getElementById('admin-sidebar-nav');
+
+    // Assert: Menu is collapsed by default and can be expanded
+    expect(toggleButton).toBeInTheDocument();
+    expect(nav).toHaveClass('hidden');
+
+    fireEvent.click(toggleButton);
+
+    expect(nav).not.toHaveClass('hidden');
+    expect(screen.getByRole('button', { name: /collapse admin menu/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /collapse admin menu/i }));
+    expect(nav).toHaveClass('hidden');
   });
+
 });

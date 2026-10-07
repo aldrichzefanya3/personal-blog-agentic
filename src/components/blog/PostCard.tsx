@@ -96,7 +96,7 @@ export function PostCard({ post }: PostCardProps) {
 
         <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-200 pt-4 dark:border-slate-700">
           <div className="flex min-w-0 items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-            {post.author.avatar_url ? (
+            {post.author?.avatar_url ? (
               <Image
                 src={post.author.avatar_url}
                 alt=""
@@ -106,10 +106,10 @@ export function PostCard({ post }: PostCardProps) {
               />
             ) : (
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-[10px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                {(post.author.display_name || 'A').slice(0, 1).toUpperCase()}
+                {(post.author?.display_name || 'F').slice(0, 1).toUpperCase()}
               </span>
             )}
-            <span className="truncate">{post.author.display_name || 'Anonymous'}</span>
+            <span className="truncate">{post.author?.display_name || 'Former contributor'}</span>
           </div>
 
           <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">

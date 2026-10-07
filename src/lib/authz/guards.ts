@@ -69,7 +69,7 @@ export async function requireRole(action: Action): Promise<SessionUser> {
  *  3. Otherwise, verify `session.id === resourceOwnerId`
  *  4. If ownership check fails, throw `AuthError('FORBIDDEN', 403)`
  *
- * @param resourceOwnerId - The ID of the user who owns the resource
+ * @param resourceOwnerId - The ID of the owner, or null when the account was removed
  * @param action - The action being attempted
  * @returns The authenticated SessionUser with verified permissions and ownership
  * @throws {AuthError} UNAUTHENTICATED (401) if no valid session exists
@@ -88,7 +88,7 @@ export async function requireRole(action: Action): Promise<SessionUser> {
  * ```
  */
 export async function requireOwnership(
-  resourceOwnerId: string,
+  resourceOwnerId: string | null,
   action: Action,
 ): Promise<SessionUser> {
   // Step 1: Verify session and role permission
