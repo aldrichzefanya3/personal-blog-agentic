@@ -1,0 +1,289 @@
+/**
+ * Animation and Transition Library
+ * 
+ * Reusable animations and transitions for modern UX.
+ * All animations kept under 300ms for responsiveness.
+ */
+
+@layer utilities {
+  /* ============================================
+     EASING CURVES
+     ============================================ */
+  .ease-smooth {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ease-bounce {
+    transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .ease-spring {
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .ease-out-expo {
+    transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  /* ============================================
+     ENTRANCE ANIMATIONS
+     ============================================ */
+  
+  /* Fade in */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 200ms ease-smooth forwards;
+  }
+
+  /* Fade up — content slides up while fading in */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 250ms ease-out-expo forwards;
+  }
+
+  /* Alias for fade-up */
+  .animate-fade-in-up {
+    animation: fade-up 250ms ease-out-expo forwards;
+  }
+
+  /* Fade down */
+  @keyframes fade-down {
+    from {
+      opacity: 0;
+      transform: translateY(-1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-down {
+    animation: fade-down 250ms ease-out-expo forwards;
+  }
+
+  /* Slide in from left */
+  @keyframes slide-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 250ms ease-out-expo forwards;
+  }
+
+  /* Slide in from right */
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 250ms ease-out-expo forwards;
+  }
+
+  /* Scale in — subtle zoom entrance */
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 200ms ease-smooth forwards;
+  }
+
+  /* ============================================
+     STAGGERED ANIMATIONS
+     Use with groups of elements for cascading effects
+     ============================================ */
+  .animate-stagger-1 {
+    animation-delay: 50ms;
+  }
+
+  .animate-stagger-2 {
+    animation-delay: 100ms;
+  }
+
+  .animate-stagger-3 {
+    animation-delay: 150ms;
+  }
+
+  .animate-stagger-4 {
+    animation-delay: 200ms;
+  }
+
+  .animate-stagger-5 {
+    animation-delay: 250ms;
+  }
+
+  /* ============================================
+     HOVER TRANSITIONS
+     Apply to interactive elements
+     ============================================ */
+  .hover-lift {
+    transition: transform 150ms ease-smooth, box-shadow 150ms ease-smooth;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .hover-scale {
+    transition: transform 150ms ease-smooth;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-glow {
+    transition: box-shadow 200ms ease-smooth;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  }
+
+  /* ============================================
+     FOCUS TRANSITIONS
+     Enhanced focus states for accessibility
+     ============================================ */
+  .focus-ring {
+    transition: box-shadow 150ms ease-smooth, outline 150ms ease-smooth;
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+  }
+
+  /* ============================================
+     LOADING ANIMATIONS
+     ============================================ */
+  
+  /* Skeleton loading */
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-skeleton {
+    animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background: linear-gradient(
+      90deg,
+      var(--color-neutral-200) 25%,
+      var(--color-neutral-100) 50%,
+      var(--color-neutral-200) 75%
+    );
+    background-size: 200% 100%;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .animate-skeleton {
+      background: linear-gradient(
+        90deg,
+        var(--color-neutral-800) 25%,
+        var(--color-neutral-700) 50%,
+        var(--color-neutral-800) 75%
+      );
+    }
+  }
+
+  /* Spinner */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin 1s linear infinite;
+  }
+
+  /* Pulse */
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* ============================================
+     UTILITY CLASSES
+     ============================================ */
+  .transition-smooth {
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-medium {
+    transition-duration: 250ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-slow {
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Disable animations for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

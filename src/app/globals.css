@@ -1,26 +1,150 @@
-@import "tailwindcss";
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@300;400;700;900&display=swap');
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Import Tailwind CSS */
+@import 'tailwindcss';
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Import Design Tokens (colors, semantic tokens) */
+@import '../styles/design-tokens.css';
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Import Animation Library */
+@import '../styles/animations.css';
+
+@layer base {
+  /* ============================================
+     BASE STYLES
+     ============================================ */
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  html {
+    /* Ensure base font size is at least 16px (Requirement 4.7) */
+    font-size: 16px;
+
+    /* Smooth scrolling for anchor links */
+    scroll-behavior: smooth;
+  }
+
+  /* Disable smooth scrolling for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ============================================
+     TYPOGRAPHY DEFAULTS
+     ============================================ */
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Merriweather', Georgia, serif;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: var(--color-link);
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  a:hover {
+    color: var(--color-link-hover);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* ============================================
+     FOCUS MANAGEMENT (Requirement 4.4)
+     Visible focus indicator with 3:1 contrast ratio
+     ============================================ */
+
+  *:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  /* ============================================
+     CODE BLOCKS
+     ============================================ */
+
+  code {
+    font-family: 'Courier New', monospace;
+    background: var(--color-code-bg);
+    color: var(--color-code-text);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+
+  pre {
+    background: var(--color-code-bg);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
+  }
+
+  /* ============================================
+     IMAGE DEFAULTS
+     ============================================ */
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ============================================
+     SELECTION STYLES
+     ============================================ */
+
+  ::selection {
+    background: var(--color-primary-200);
+    color: var(--color-text);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    ::selection {
+      background: var(--color-primary-800);
+      color: var(--color-text);
+    }
+  }
 }

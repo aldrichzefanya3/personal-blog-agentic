@@ -1,0 +1,158 @@
+
+> personal-blog-agentic@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env
+✓ Running next.config.ts took 140ms
+- Experiments (use with caution):
+  · serverActions
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.5s
+  Running TypeScript ...
+src/app/(admin)/admin/media/media-library.tsx(62,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'SetStateAction<string | null>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<string | null>'.
+src/components/admin/MediaUploader.tsx(82,18): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'SetStateAction<string | null>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<string | null>'.
+src/components/admin/PostForm.tsx(179,30): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/components/admin/PostForm.tsx(179,30): error TS18048: 'actions.deletePost' is possibly 'undefined'.
+src/lib/csrf.ts(133,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | null'.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/lib/csrf.ts(137,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | null'.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/test/unit/admin/AdminDashboard.test.tsx(63,45): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(64,35): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(66,49): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(67,36): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(69,48): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(70,35): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(72,44): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(73,35): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(75,38): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(76,35): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(78,45): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(79,36): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(131,46): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(134,47): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(135,47): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(138,43): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(139,39): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(142,54): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(143,54): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(165,49): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(181,55): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(184,7): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(187,51): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/admin/AdminDashboard.test.tsx(188,55): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/admin/AdminDashboard.test.tsx(189,50): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/admin/AdminDashboard.test.tsx(192,52): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/admin/AdminDashboard.test.tsx(217,55): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(220,51): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/admin/AdminDashboard.test.tsx(221,55): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/admin/AdminDashboard.test.tsx(224,52): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/admin/AdminDashboard.test.tsx(294,28): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(295,24): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/admin/AdminDashboard.test.tsx(296,27): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(35,45): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(36,43): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(37,39): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(38,44): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(39,38): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(40,39): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(48,48): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(56,42): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(64,45): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(65,43): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(66,39): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(67,44): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(68,38): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(69,39): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(70,42): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(82,23): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(94,27): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(95,23): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(103,56): error TS2339: Property 'toHaveAttribute' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(104,52): error TS2339: Property 'toHaveAttribute' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(105,57): error TS2339: Property 'toHaveAttribute' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(106,51): error TS2339: Property 'toHaveAttribute' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(107,52): error TS2339: Property 'toHaveAttribute' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(108,55): error TS2339: Property 'toHaveAttribute' does not exist on type 'Assertion<void, HTMLAnchorElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(117,19): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(118,19): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(121,17): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(130,19): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/components/Sidebar.test.tsx(144,43): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/components/Sidebar.test.tsx(146,48): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/AdminLayout.test.tsx(86,46): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/layout/AdminLayout.test.tsx(108,46): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/layout/AdminLayout.test.tsx(130,45): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/layout/AdminLayout.test.tsx(131,43): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/layout/AdminLayout.test.tsx(132,39): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/layout/AdminLayout.test.tsx(154,18): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/AdminLayout.test.tsx(155,18): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/AdminLayout.test.tsx(156,18): error TS2551: Property 'toContainHTML' does not exist on type 'Assertion<void, HTMLElement | null>'. Did you mean 'toContain'?
+src/test/unit/layout/AdminLayout.test.tsx(178,23): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, Element | null>'.
+src/test/unit/layout/AdminLayout.test.tsx(179,23): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, Element | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(14,46): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement>'.
+src/test/unit/layout/PublicLayout.test.tsx(18,18): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(19,18): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(24,20): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(25,20): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(36,28): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, Element | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(37,28): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, Element | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(38,28): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, Element | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(39,28): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, Element | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(50,18): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(51,18): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(52,18): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(53,18): error TS2339: Property 'toHaveClass' does not exist on type 'Assertion<void, HTMLElement | null>'.
+src/test/unit/layout/PublicLayout.test.tsx(65,28): error TS2339: Property 'toBeInTheDocument' does not exist on type 'Assertion<void, Element | null>'.
+Failed to type check.
+
+Turbopack build encountered 2 warnings:
+./src/lib/env.ts:60:3
+Warning: A Node.js API is used (process.exit at line: 60) which is not supported in the Edge Runtime.
+    Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+  [90m58 |[0m   [90m// Use process.stderr so the message is visible even when stdout is piped.[0m
+  [90m59 |[0m   process.stderr.write(lines.join([32m'\n'[0m));
+[33m[1m>[0m [90m60 |[0m   process.exit([35m1[0m);
+  [90m   |[0m   [33m[1m^^^^^^^^^^^^[0m
+  [90m61 |[0m }
+  [90m62 |[0m
+
+Ecmascript file had an error
+
+Import traces:
+  Edge Instrumentation:
+    ./src/lib/env.ts
+    ./src/instrumentation.ts
+
+  Instrumentation:
+    ./src/lib/env.ts
+    ./src/instrumentation.ts
+
+
+./src/lib/env.ts:59:3
+Warning: A Node.js API is used (process.stderr at line: 59) which is not supported in the Edge Runtime.
+    Learn more: https://nextjs.org/docs/api-reference/edge-runtime
+  [90m57 |[0m
+  [90m58 |[0m   [90m// Use process.stderr so the message is visible even when stdout is piped.[0m
+[33m[1m>[0m [90m59 |[0m   process.stderr.write(lines.join([32m'\n'[0m));
+  [90m   |[0m   [33m[1m^^^^^^^^^^^^^^[0m
+  [90m60 |[0m   process.exit([35m1[0m);
+  [90m61 |[0m }
+  [90m62 |[0m
+
+Ecmascript file had an error
+
+Import traces:
+  Edge Instrumentation:
+    ./src/lib/env.ts
+    ./src/instrumentation.ts
+
+  Instrumentation:
+    ./src/lib/env.ts
+    ./src/instrumentation.ts
+
+
