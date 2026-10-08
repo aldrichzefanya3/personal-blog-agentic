@@ -1,14 +1,10 @@
 /**
- * Next.js Proxy (formerly middleware) — Auth and Security Headers
+ * Next.js middleware — Auth and Security Headers
  *
  * Runs before every matched request to:
  *  1. Refresh the Supabase session transparently (Req 8.9)
  *  2. Redirect unauthenticated visitors away from /admin/** (Req 8.8)
  *  3. Set security headers on every response (Req 15.1–15.5, 15.8)
- *
- * NOTE: In Next.js 16, the middleware file convention was renamed from
- * `middleware.ts` to `proxy.ts` and the exported function from `middleware`
- * to `proxy`. All functionality is identical.
  *
  * Requirements: 8.8, 8.9, 15.1, 15.2, 15.3, 15.4, 15.5, 15.8
  */
@@ -71,10 +67,10 @@ export function buildCSP(nonce: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Proxy function (formerly middleware)
+// Middleware function
 // ---------------------------------------------------------------------------
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Start building the response — we need it early to set cookies from the
   // Supabase SSR library when a token refresh occurs.
     const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
