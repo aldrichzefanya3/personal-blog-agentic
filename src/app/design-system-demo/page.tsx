@@ -150,7 +150,7 @@ export default function DesignSystemDemo() {
             <div>
               <p className="text-caption text-[var(--color-text-muted)] mb-2">Caption & Code</p>
               <p className="text-caption">Caption text for image descriptions or metadata</p>
-              <code className="text-caption">const example = "inline code";</code>
+              <code className="text-caption">const example = &quot;inline code&quot;;</code>
             </div>
           </div>
         </section>

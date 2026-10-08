@@ -11,7 +11,7 @@
  * Req 8.2 — Session tokens are NEVER stored in localStorage or sessionStorage;
  *            `@supabase/ssr`'s `createBrowserClient` persists sessions via
  *            cookies only, which the server-side client can also read.
- * Req 8.3 — Only the anon key is used here; the service-role key MUST NOT
+ * Req 8.3 — Only the anon key is used here; the service role key MUST NOT
  *            appear in any browser-executed code.
  */
 
@@ -27,8 +27,8 @@ import { createBrowserClient } from '@supabase/ssr';
  * creating redundant connections.
  *
  * Security constraints:
- *  - Only the public `NEXT_PUBLIC_SUPABASE_ANON_KEY` is passed.  The
- *    service-role key MUST NOT be referenced here or in any client bundle.
+ *  - Only the public `NEXT_PUBLIC_SUPABASE_ANON_KEY` is passed. The
+ *    service role key MUST NOT be referenced here or in any client bundle.
  *  - Sessions are stored in cookies (not localStorage) so that SSR and
  *    Server Actions can read the same session.
  *

@@ -15,7 +15,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { UserRole } from '@/types/database';
 
 interface SidebarProps {
@@ -61,11 +61,6 @@ function canAccessNavItem(userRole: UserRole, item: NavItem): boolean {
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-
-  // Close the mobile menu whenever the route changes.
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
 
   // Filter nav items based on user role (Req 9.4)
   const visibleItems = NAV_ITEMS.filter((item) => canAccessNavItem(role, item));

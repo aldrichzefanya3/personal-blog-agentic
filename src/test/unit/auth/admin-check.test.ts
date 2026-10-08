@@ -7,15 +7,17 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { hasAdminUser } from '@/lib/auth/admin-check';
-import * as dbClient from '@/lib/db/client';
+
+const { mockSql } = vi.hoisted(() => ({
+  mockSql: vi.fn(),
+}));
 
 // Mock the database client
 vi.mock('@/lib/db/client', () => ({
-  sql: vi.fn(),
+  sql: mockSql,
 }));
 
 describe('hasAdminUser', () => {
-  const mockSql = vi.mocked(dbClient.sql);
 
   beforeEach(() => {
     vi.clearAllMocks();

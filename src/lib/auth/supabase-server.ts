@@ -38,8 +38,6 @@ import { cookies } from 'next/headers';
  *   - `path: '/'`       — cookie is sent with every request
  */
 export async function createSupabaseServerClient() {
-  const cookieStore = await cookies();
-
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
@@ -50,6 +48,7 @@ export async function createSupabaseServerClient() {
     );
   }
 
+  const cookieStore = await cookies();
   const isProduction = process.env.NODE_ENV === 'production';
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {

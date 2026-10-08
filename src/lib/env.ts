@@ -26,9 +26,8 @@ const REQUIRED_ENV_VARS = [
 
 /**
  * Validates that every variable listed in REQUIRED_ENV_VARS is present in
- * `process.env`.  If one or more are missing, it prints a descriptive error
- * message listing each missing variable and calls `process.exit(1)` so the
- * process terminates immediately rather than continuing in a broken state.
+ * `process.env`. If one or more are missing, it throws a descriptive error so
+ * the app fails fast without relying on Node-only APIs such as `process.exit`.
  *
  * This function is intentionally synchronous and side-effectful — it is meant
  * to be called at module load time before any request handling begins.
@@ -40,7 +39,7 @@ export function validateEnv(): void {
     return;
   }
 
-  const lines = [
+  const message = [
     '',
     '========================================================',
     '  Missing required environment variables',
@@ -54,9 +53,7 @@ export function validateEnv(): void {
     '',
     '========================================================',
     '',
-  ];
+  ].join('\n');
 
-  // Use process.stderr so the message is visible even when stdout is piped.
-  process.stderr.write(lines.join('\n'));
-  process.exit(1);
+  throw new Error(message);
 }

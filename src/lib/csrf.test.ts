@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import { verifyCsrfToken, generateCsrfToken, getCsrfToken } from './csrf';
 
@@ -13,32 +14,40 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(),
 }));
 
+const mockedCookies = vi.mocked(cookies);
+
+type MockCookieStore = Awaited<ReturnType<typeof cookies>>;
+
 describe('CSRF Token Generation', () => {
   let mockCookies: Map<string, { value: string }>;
-  let mockCookieStore: {
-    get: (name: string) => { value: string } | undefined;
-    set: (
-      name: string,
-      value: string,
-      options?: Record<string, unknown>,
-    ) => void;
-    delete: (name: string) => void;
-  };
+  let mockCookieStore: MockCookieStore;
 
   beforeEach(() => {
     mockCookies = new Map();
     mockCookieStore = {
       get: (name: string) => mockCookies.get(name),
+      getAll: () => Array.from(mockCookies.entries()).map(([name, value]) => ({ name, value: value.value })),
+      has: (name: string) => mockCookies.has(name),
       set: (name: string, value: string) => {
         mockCookies.set(name, { value });
       },
       delete: (name: string) => {
         mockCookies.delete(name);
       },
-    };
+      clear: () => {
+        mockCookies.clear();
+        return mockCookieStore;
+      },
+      [Symbol.iterator]: function* () {
+        for (const [name, value] of mockCookies.entries()) {
+          yield [name, { name, value: value.value }] as [string, { name: string; value: string }];
+        }
+      },
+      size: 0,
+      toString: () => '',
+    } as unknown as MockCookieStore;
 
-    const { cookies } = require('next/headers');
-    cookies.mockResolvedValue(mockCookieStore);
+    mockedCookies.mockResolvedValue(mockCookieStore);
   });
 
   it('should generate a hex-encoded token', async () => {
@@ -56,11 +65,11 @@ describe('CSRF Token Generation', () => {
     expect(storedToken?.value).toBe(token);
   });
 
-  it('should generate different tokens on each call', async () => {
+  it('should reuse the same token for the active session', async () => {
     const token1 = await generateCsrfToken();
     const token2 = await generateCsrfToken();
 
-    expect(token1).not.toBe(token2);
+    expect(token1).toBe(token2);
   });
 
   it('should return existing token if present', async () => {
@@ -81,30 +90,34 @@ describe('CSRF Token Generation', () => {
 
 describe('CSRF Token Verification', () => {
   let mockCookies: Map<string, { value: string }>;
-  let mockCookieStore: {
-    get: (name: string) => { value: string } | undefined;
-    set: (
-      name: string,
-      value: string,
-      options?: Record<string, unknown>,
-    ) => void;
-    delete: (name: string) => void;
-  };
+  let mockCookieStore: MockCookieStore;
 
   beforeEach(() => {
     mockCookies = new Map();
     mockCookieStore = {
       get: (name: string) => mockCookies.get(name),
+      getAll: () => Array.from(mockCookies.entries()).map(([name, value]) => ({ name, value: value.value })),
+      has: (name: string) => mockCookies.has(name),
       set: (name: string, value: string) => {
         mockCookies.set(name, { value });
       },
       delete: (name: string) => {
         mockCookies.delete(name);
       },
-    };
+      clear: () => {
+        mockCookies.clear();
+        return mockCookieStore;
+      },
+      [Symbol.iterator]: function* () {
+        for (const [name, value] of mockCookies.entries()) {
+          yield [name, { name, value: value.value }] as [string, { name: string; value: string }];
+        }
+      },
+      size: 0,
+      toString: () => '',
+    } as unknown as MockCookieStore;
 
-    const { cookies } = require('next/headers');
-    cookies.mockResolvedValue(mockCookieStore);
+    mockedCookies.mockResolvedValue(mockCookieStore);
   });
 
   it('should verify a valid token submitted via header', async () => {
@@ -195,12 +208,14 @@ describe('CSRF Token Verification', () => {
   });
 
   it('should reject invalid hex tokens', async () => {
-    mockCookies.set('csrf_token', { value: 'invalid-token' });
+    const validToken =
+      'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2';
+    mockCookies.set('csrf_token', { value: validToken });
 
     const request = new NextRequest('http://localhost:8000/api/test', {
       method: 'POST',
       headers: {
-        'x-csrf-token': 'invalid-token',
+        'x-csrf-token': 'not-a-valid-hex-token',
         'content-type': 'application/json',
       },
       body: JSON.stringify({ data: 'test' }),

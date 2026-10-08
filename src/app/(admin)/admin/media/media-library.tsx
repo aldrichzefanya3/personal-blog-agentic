@@ -58,7 +58,7 @@ export function MediaLibrary({ media, pagination }: MediaLibraryProps) {
 
       const result = await deleteMediaAction(formData);
 
-      if ('error' in result) {
+      if ('error' in result && typeof result.error === 'string') {
         setError(result.error);
       } else {
         // Success — refresh the page

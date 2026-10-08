@@ -78,7 +78,7 @@ export function MediaUploader() {
 
       const result = await uploadMediaAction(formData);
 
-      if ('error' in result) {
+      if ('error' in result && typeof result.error === 'string') {
         setError(result.error);
       } else {
         // Success (Req 13.6)

@@ -168,18 +168,17 @@ export async function proxy(request: NextRequest) {
  */
 function applySecurityHeaders(
   response: NextResponse,
-    nonce: string,
-    contentSecurityPolicy: string,
+  nonce: string,
+  contentSecurityPolicy: string,
 ): NextResponse {
-  // Generate a fresh per-request nonce.  crypto.randomUUID() is available in
+  // Generate a fresh per-request nonce. crypto.randomUUID() is available in
   // the Node.js runtime and the Edge runtime.
 
   // Pass the nonce downstream so Server Components can use it for inline
   // scripts/styles (set as a request header so it is available via headers()).
-  const requestHeaders = new Headers(request.headers);
 
   // Req 15.1 — Content-Security-Policy with per-request nonce.
-    response.headers.set('Content-Security-Policy', contentSecurityPolicy);
+  response.headers.set('Content-Security-Policy', contentSecurityPolicy);
   // Req 15.2 — Prevent clickjacking.
   response.headers.set('X-Frame-Options', 'DENY');
   // Req 15.3 — Prevent MIME-type sniffing.

@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 import tailwindTypography from '@tailwindcss/typography';
+import plugin from 'tailwindcss/plugin';
 
 const config: Config = {
   // Dark mode is controlled by the root .dark class.
@@ -218,8 +219,7 @@ const config: Config = {
 
   plugins: [
     tailwindTypography,
-    // Custom plugin for prose overrides
-    function ({ addComponents }: any) {
+    plugin(({ addComponents }) => {
       addComponents({
         '.prose-blog': {
           '--tw-prose-body': 'var(--color-text)',
@@ -234,7 +234,7 @@ const config: Config = {
           'max-width': '65ch',
         },
       });
-    },
+    }),
   ],
 };
 
