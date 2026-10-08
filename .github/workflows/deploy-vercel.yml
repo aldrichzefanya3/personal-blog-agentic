@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - production
-      - staging
+      - development
 
 permissions:
   contents: read
@@ -44,21 +44,21 @@ jobs:
           if [ "$GITHUB_REF_NAME" = "production" ]; then
             vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           else
-            vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+            vercel pull --yes --environment=preview --git-branch=development --token="$VERCEL_TOKEN"
           fi
 
       - name: Build production deployment
         if: github.ref_name == 'production'
         run: vercel build --prod --token="$VERCEL_TOKEN"
 
-      - name: Build development deployment
-        if: github.ref_name == 'staging'
+      - name: Build development preview
+        if: github.ref_name == 'development'
         run: vercel build --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel production
         if: github.ref_name == 'production'
         run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
-      - name: Deploy to Vercel preview
-        if: github.ref_name == 'staging'
+      - name: Deploy development preview
+        if: github.ref_name == 'development'
         run: vercel deploy --prebuilt --token="$VERCEL_TOKEN"
