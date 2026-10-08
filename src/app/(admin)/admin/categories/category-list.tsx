@@ -11,6 +11,7 @@ import {
   createCategoryAction,
   updateCategoryAction,
   deleteCategoryAction,
+  setCategoryAutoPublishAction,
 } from '@/actions/categories';
 
 interface CategoryListProps {
@@ -85,6 +86,26 @@ export function CategoryList({ categories: initialCategories }: CategoryListProp
       } else if (result.success) {
         // Remove the category from the list
         setCategories((prev) => prev.filter((cat) => cat.id !== id));
+      }
+    });
+  };
+
+  const handleAutoPublishChange = async (category: Category, enabled: boolean) => {
+    setError(null);
+    const formData = new FormData();
+    formData.set('id', category.id);
+    formData.set('auto_publish', String(enabled));
+
+    startTransition(async () => {
+      const result = await setCategoryAutoPublishAction(formData);
+      if (result.error) {
+        setError(result.error);
+      } else if (result.success && result.category) {
+        setCategories((prev) =>
+          prev.map((item) =>
+            item.id === category.id ? result.category! : item,
+          ),
+        );
       }
     });
   };
@@ -165,6 +186,9 @@ export function CategoryList({ categories: initialCategories }: CategoryListProp
                     <th scope="col" className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Created
                     </th>
+                    <th scope="col" className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      AI auto-publish
+                    </th>
                     <th scope="col" className="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                       Actions
                     </th>
@@ -194,6 +218,21 @@ export function CategoryList({ categories: initialCategories }: CategoryListProp
                       </td>
                       <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
                         {new Date(category.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
+                        <label className="inline-flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={category.auto_publish ?? false}
+                            disabled={isPending}
+                            onChange={(event) =>
+                              handleAutoPublishChange(category, event.target.checked)
+                            }
+                            aria-label={`Automatically publish AI posts in ${category.name}`}
+                            className="size-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                          />
+                          <span>{category.auto_publish ? 'On' : 'Off'}</span>
+                        </label>
                       </td>
                       <td className="whitespace-nowrap px-5 py-4 text-right text-sm font-medium">
                         {editingId === category.id ? (
@@ -298,6 +337,21 @@ export function CategoryList({ categories: initialCategories }: CategoryListProp
                       <p className="mt-1 text-slate-700 dark:text-slate-300">
                         {new Date(category.created_at).toLocaleDateString()}
                       </p>
+                    </div>
+                    <div className="col-span-2">
+                      <label className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                        <input
+                          type="checkbox"
+                          checked={category.auto_publish ?? false}
+                          disabled={isPending}
+                          onChange={(event) =>
+                            handleAutoPublishChange(category, event.target.checked)
+                          }
+                          aria-label={`Automatically publish AI posts in ${category.name}`}
+                          className="size-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                        />
+                        Automatically publish AI posts
+                      </label>
                     </div>
                   </div>
                 </div>

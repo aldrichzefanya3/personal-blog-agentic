@@ -53,7 +53,9 @@ export async function generatePostMetadata(
 
   // Description: use excerpt if available, otherwise first 160 chars of content (Req 3.1)
   let description: string;
-  if (post.excerpt) {
+  if (post.ai_meta_description) {
+    description = truncate(post.ai_meta_description, 160);
+  } else if (post.excerpt) {
     description = truncate(post.excerpt, 160);
   } else if (post.content) {
     const plainText = extractPlainText(post.content);

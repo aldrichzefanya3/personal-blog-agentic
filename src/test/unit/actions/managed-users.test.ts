@@ -12,6 +12,8 @@ vi.mock('@/lib/db/queries/users', () => ({
   generateAnonymousDisplayName: vi.fn(() => 'Anonymous-deadbeef'),
   getAllUsers: vi.fn(),
   getUserById: vi.fn(),
+  setAiWriterEnabled: vi.fn(),
+  updateManagedUserRole: vi.fn(),
   updateUserProfile: vi.fn(),
 }));
 
@@ -31,10 +33,21 @@ vi.mock('@/lib/errors', () => ({
   },
 }));
 
-import { createManagedUser, deleteUserAccount, updateMyDisplayName } from '@/actions/users';
+import {
+  changeManagedUserRole,
+  createManagedUser,
+  deleteUserAccount,
+  setManagedAiWriterEnabled,
+  updateMyDisplayName,
+} from '@/actions/users';
 import { createClient } from '@supabase/supabase-js';
 import { requireRole } from '@/lib/authz/guards';
-import { getUserById, updateUserProfile } from '@/lib/db/queries/users';
+import {
+  getUserById,
+  setAiWriterEnabled,
+  updateManagedUserRole,
+  updateUserProfile,
+} from '@/lib/db/queries/users';
 import { getServerSession } from '@/lib/auth/session';
 import { AuthError } from '@/lib/errors';
 
@@ -53,6 +66,7 @@ describe('managed user actions', () => {
       bio: null,
       avatar_url: null,
       created_at: '2024-01-01T00:00:00Z',
+      ai_writer_enabled: false,
     });
   });
 
@@ -63,7 +77,10 @@ describe('managed user actions', () => {
   it('lets only an ADMIN create an EDITOR account with a random name and one-time password', async () => {
     vi.stubEnv('SUPABASE_URL', 'https://example.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service-role-key');
-    mockRequireRole.mockResolvedValue({ id: 'admin-456', role: 'ADMIN' } as never);
+    mockRequireRole.mockResolvedValue({
+      id: 'admin-456',
+      role: 'ADMIN',
+    } as never);
     const createUser = vi.fn().mockResolvedValue({
       data: { user: { id: 'new-user-789' } },
       error: null,
@@ -82,12 +99,16 @@ describe('managed user actions', () => {
         role: 'EDITOR',
         display_name: 'Anonymous-deadbeef',
       });
-      expect(result.temporaryPassword).toMatch(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{14}$/);
+      expect(result.temporaryPassword).toMatch(
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{14}$/,
+      );
     }
-    expect(createUser).toHaveBeenCalledWith(expect.objectContaining({
-      app_metadata: { managed_role: 'EDITOR' },
-      user_metadata: { display_name: 'Anonymous-deadbeef' },
-    }));
+    expect(createUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        app_metadata: { managed_role: 'EDITOR' },
+        user_metadata: { display_name: 'Anonymous-deadbeef' },
+      }),
+    );
     expect(mockRequireRole).toHaveBeenCalledWith('user:manage');
   });
 
@@ -96,8 +117,77 @@ describe('managed user actions', () => {
 
     const result = await createManagedUser('editor@example.com');
 
-    expect(result).toEqual({ success: false, error: 'Insufficient permissions' });
+    expect(result).toEqual({
+      success: false,
+      error: 'Insufficient permissions',
+    });
     expect(mockCreateClient).not.toHaveBeenCalled();
+  });
+
+  it('lets an ADMIN create a paused AI_WRITER account', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://example.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service-role-key');
+    mockRequireRole.mockResolvedValue({
+      id: 'admin-456',
+      role: 'ADMIN',
+    } as never);
+    const createUser = vi.fn().mockResolvedValue({
+      data: { user: { id: 'ai-writer-789' } },
+      error: null,
+    });
+    mockCreateClient.mockReturnValue({
+      auth: { admin: { createUser } },
+    } as never);
+
+    const result = await createManagedUser('writer@example.com', 'AI_WRITER');
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.user.role).toBe('AI_WRITER');
+      expect(result.temporaryPassword).toBeNull();
+    }
+    expect(createUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        app_metadata: { managed_role: 'AI_WRITER' },
+      }),
+    );
+  });
+
+  it('lets an ADMIN assign the AI_WRITER role to an existing account', async () => {
+    mockRequireRole.mockResolvedValue({
+      id: 'admin-456',
+      role: 'ADMIN',
+    } as never);
+    vi.mocked(updateManagedUserRole).mockResolvedValue({
+      id: 'editor-123',
+      role: 'AI_WRITER',
+      ai_writer_enabled: false,
+    } as never);
+
+    const result = await changeManagedUserRole('editor-123', 'AI_WRITER');
+
+    expect(result).toEqual({ success: true });
+    expect(updateManagedUserRole).toHaveBeenCalledWith(
+      'editor-123',
+      'AI_WRITER',
+    );
+  });
+
+  it('lets an ADMIN enable daily runs for an AI_WRITER account', async () => {
+    mockRequireRole.mockResolvedValue({
+      id: 'admin-456',
+      role: 'ADMIN',
+    } as never);
+    vi.mocked(setAiWriterEnabled).mockResolvedValue({
+      id: 'writer-123',
+      role: 'AI_WRITER',
+      ai_writer_enabled: true,
+    } as never);
+
+    const result = await setManagedAiWriterEnabled('writer-123', true);
+
+    expect(result).toEqual({ success: true });
+    expect(setAiWriterEnabled).toHaveBeenCalledWith('writer-123', true);
   });
 
   it('lets a signed-in user change their own display name', async () => {
@@ -119,13 +209,18 @@ describe('managed user actions', () => {
     const result = await updateMyDisplayName('  Editor Name  ');
 
     expect(result.success).toBe(true);
-    expect(mockUpdateUserProfile).toHaveBeenCalledWith('editor-123', { display_name: 'Editor Name' });
+    expect(mockUpdateUserProfile).toHaveBeenCalledWith('editor-123', {
+      display_name: 'Editor Name',
+    });
   });
 
   it('deletes another account through Supabase Auth', async () => {
     vi.stubEnv('SUPABASE_URL', 'https://example.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service-role-key');
-    mockRequireRole.mockResolvedValue({ id: 'admin-456', role: 'ADMIN' } as never);
+    mockRequireRole.mockResolvedValue({
+      id: 'admin-456',
+      role: 'ADMIN',
+    } as never);
     const deleteUser = vi.fn().mockResolvedValue({ error: null });
     mockCreateClient.mockReturnValue({
       auth: { admin: { deleteUser } },
@@ -138,11 +233,17 @@ describe('managed user actions', () => {
   });
 
   it('prevents the only ADMIN from deleting their own account', async () => {
-    mockRequireRole.mockResolvedValue({ id: 'admin-456', role: 'ADMIN' } as never);
+    mockRequireRole.mockResolvedValue({
+      id: 'admin-456',
+      role: 'ADMIN',
+    } as never);
 
     const result = await deleteUserAccount('admin-456');
 
-    expect(result).toEqual({ success: false, error: 'You cannot remove your own account' });
+    expect(result).toEqual({
+      success: false,
+      error: 'You cannot remove your own account',
+    });
     expect(mockCreateClient).not.toHaveBeenCalled();
   });
 });

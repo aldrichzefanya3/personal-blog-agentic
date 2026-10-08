@@ -4,12 +4,14 @@
  * Requirements: 9.1, 9.3
  *
  * Req 9.1 — Only ADMIN users can access this page (enforced via requireRole)
- * Req 9.3 — Allows the sole ADMIN to create and remove EDITOR accounts
+ * Req 9.3 — Allows the ADMIN to create, assign roles, and remove managed accounts
  */
 
 import { requireRole } from '@/lib/authz/guards';
 import { getAllUsers } from '@/lib/db/queries/users';
 import { UserManagementTable } from './user-management-table';
+
+export const maxDuration = 300;
 
 /**
  * User Management Settings Page component.
@@ -34,15 +36,16 @@ export default async function SettingsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+        <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
           User Management
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Create editor accounts and manage existing accounts
+          Create accounts, assign Editor or AI Writer roles, and control which
+          AI Writers run daily
         </p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
         <UserManagementTable users={users} currentUserId={session.id} />
       </div>
     </div>

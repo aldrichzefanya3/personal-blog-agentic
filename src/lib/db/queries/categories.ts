@@ -13,7 +13,7 @@ import type {
  */
 export async function getAllCategories(): Promise<Category[]> {
   const rows = await sql<Category[]>`
-    SELECT id, name, slug, created_at
+    SELECT id, name, slug, created_at, auto_publish
     FROM public.categories
     ORDER BY name ASC
   `;
@@ -27,7 +27,7 @@ export async function getCategoryBySlug(
   slug: string,
 ): Promise<Category | null> {
   const rows = await sql<Category[]>`
-    SELECT id, name, slug, created_at
+    SELECT id, name, slug, created_at, auto_publish
     FROM public.categories
     WHERE slug = ${slug}
     LIMIT 1
@@ -44,7 +44,7 @@ export async function createCategory(
   const rows = await sql<Category[]>`
     INSERT INTO public.categories (name, slug)
     VALUES (${input.name}, ${input.slug})
-    RETURNING id, name, slug, created_at
+    RETURNING id, name, slug, created_at, auto_publish
   `;
   return rows[0];
 }
@@ -62,9 +62,10 @@ export async function updateCategory(
     UPDATE public.categories
     SET
       name       = COALESCE(${input.name ?? null}, name),
-      slug       = COALESCE(${input.slug ?? null}, slug)
+      slug       = COALESCE(${input.slug ?? null}, slug),
+      auto_publish = COALESCE(${input.auto_publish ?? null}, auto_publish)
     WHERE id = ${id}
-    RETURNING id, name, slug, created_at
+    RETURNING id, name, slug, created_at, auto_publish
   `;
   return rows[0] ?? null;
 }

@@ -26,6 +26,10 @@ interface PostRow {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  ai_generated: boolean;
+  ai_review_status: PostWithRelations['ai_review_status'];
+  ai_meta_description: string | null;
+  ai_image_prompt: string | null;
   author_display_name: string | null;
   author_avatar_url: string | null;
   categories: Array<{
@@ -51,6 +55,10 @@ function mapPostRow(row: PostRow): PostWithRelations {
     published_at: row.published_at,
     created_at: row.created_at,
     updated_at: row.updated_at,
+    ai_generated: row.ai_generated,
+    ai_review_status: row.ai_review_status,
+    ai_meta_description: row.ai_meta_description,
+    ai_image_prompt: row.ai_image_prompt,
     author: row.author_id
       ? {
           id: row.author_id,

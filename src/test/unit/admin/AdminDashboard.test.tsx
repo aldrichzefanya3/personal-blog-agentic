@@ -50,6 +50,10 @@ describe('AdminDashboardPage', () => {
         published_at: '2024-01-15T10:00:00Z',
         created_at: '2024-01-15T10:00:00Z',
         updated_at: '2024-01-15T10:00:00Z',
+        ai_generated: false,
+        ai_review_status: 'not_applicable',
+        ai_meta_description: null,
+        ai_image_prompt: null,
       },
     ];
 
@@ -105,6 +109,10 @@ describe('AdminDashboardPage', () => {
         published_at: '2024-01-15T10:00:00Z',
         created_at: '2024-01-15T10:00:00Z',
         updated_at: '2024-01-15T10:00:00Z',
+        ai_generated: false,
+        ai_review_status: 'not_applicable',
+        ai_meta_description: null,
+        ai_image_prompt: null,
       },
       {
         id: '2',
@@ -118,6 +126,10 @@ describe('AdminDashboardPage', () => {
         published_at: null,
         created_at: '2024-01-14T10:00:00Z',
         updated_at: '2024-01-14T10:00:00Z',
+        ai_generated: false,
+        ai_review_status: 'not_applicable',
+        ai_meta_description: null,
+        ai_image_prompt: null,
       },
     ];
 
@@ -250,6 +262,10 @@ describe('AdminDashboardPage', () => {
         published_at: '2024-01-15T10:00:00Z',
         created_at: '2024-01-15T10:00:00Z',
         updated_at: '2024-01-15T10:00:00Z',
+        ai_generated: false,
+        ai_review_status: 'not_applicable',
+        ai_meta_description: null,
+        ai_image_prompt: null,
       },
       {
         id: '2',
@@ -263,6 +279,10 @@ describe('AdminDashboardPage', () => {
         published_at: null,
         created_at: '2024-01-14T10:00:00Z',
         updated_at: '2024-01-14T10:00:00Z',
+        ai_generated: false,
+        ai_review_status: 'not_applicable',
+        ai_meta_description: null,
+        ai_image_prompt: null,
       },
       {
         id: '3',
@@ -276,6 +296,10 @@ describe('AdminDashboardPage', () => {
         published_at: '2024-01-13T10:00:00Z',
         created_at: '2024-01-13T10:00:00Z',
         updated_at: '2024-01-13T10:00:00Z',
+        ai_generated: false,
+        ai_review_status: 'not_applicable',
+        ai_meta_description: null,
+        ai_image_prompt: null,
       },
     ];
 

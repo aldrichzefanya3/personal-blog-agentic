@@ -48,6 +48,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Set<Action>> = {
     'tag:write',
     'media:upload',
   ]),
+  AI_WRITER: new Set(),
 };
 
 /**

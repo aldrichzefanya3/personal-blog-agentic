@@ -166,6 +166,31 @@ export async function updateCategoryAction(formData: FormData) {
   }
 }
 
+export async function setCategoryAutoPublishAction(formData: FormData) {
+  try {
+    await requireRole('category:write');
+
+    const id = formData.get('id')?.toString();
+    const autoPublishValue = formData.get('auto_publish')?.toString();
+    if (!id || (autoPublishValue !== 'true' && autoPublishValue !== 'false')) {
+      return { error: 'Category and auto-publish setting are required' };
+    }
+
+    const category = await dbUpdateCategory(id, {
+      auto_publish: autoPublishValue === 'true',
+    });
+    if (!category) {
+      return { error: 'Category not found' };
+    }
+
+    revalidatePath('/admin/categories');
+    return { success: true, category };
+  } catch (error) {
+    console.error('setCategoryAutoPublishAction error:', error);
+    return { error: 'Failed to update the category publishing setting.' };
+  }
+}
+
 /**
  * Delete a category (Req 12.4)
  *

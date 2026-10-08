@@ -121,6 +121,7 @@ describe('getServerSession', () => {
       bio: 'I am an admin',
       avatar_url: 'https://example.com/avatar.jpg',
       created_at: '2024-01-01T00:00:00Z',
+      ai_writer_enabled: false,
     };
     const mockSupabase = {
       auth: {
@@ -169,6 +170,7 @@ describe('getServerSession', () => {
       bio: null,
       avatar_url: null,
       created_at: '2024-01-02T00:00:00Z',
+      ai_writer_enabled: false,
     };
     const mockSupabase = {
       auth: {
@@ -208,6 +210,7 @@ describe('getServerSession', () => {
       bio: null,
       avatar_url: null,
       created_at: '2024-01-03T00:00:00Z',
+      ai_writer_enabled: false,
     };
     const mockSupabase = {
       auth: {
@@ -252,6 +255,7 @@ describe('getServerSession', () => {
       bio: null,
       avatar_url: null,
       created_at: '2024-01-04T00:00:00Z',
+      ai_writer_enabled: false,
     };
     const mockSupabase = {
       auth: {

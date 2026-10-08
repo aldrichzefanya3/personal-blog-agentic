@@ -41,8 +41,8 @@ const EDITOR_DENIED_ACTIONS: Action[] = [
 ];
 
 describe('ROLE_PERMISSIONS', () => {
-  it('defines permissions for both supported roles', () => {
-    const roles: UserRole[] = ['ADMIN', 'EDITOR'];
+  it('defines permissions for all supported roles', () => {
+    const roles: UserRole[] = ['ADMIN', 'EDITOR', 'AI_WRITER'];
     for (const role of roles) {
       expect(ROLE_PERMISSIONS).toHaveProperty(role);
       expect(ROLE_PERMISSIONS[role]).toBeInstanceOf(Set);
@@ -60,6 +60,10 @@ describe('ROLE_PERMISSIONS', () => {
   it('EDITOR has exactly 6 permitted actions', () => {
     const editorPerms = ROLE_PERMISSIONS['EDITOR'];
     expect(editorPerms.size).toBe(6);
+  });
+
+  it('AI_WRITER has no interactive admin permissions', () => {
+    expect(ROLE_PERMISSIONS.AI_WRITER.size).toBe(0);
   });
 
   it('EDITOR has all post/category/tag/media actions', () => {
@@ -106,6 +110,14 @@ describe('isAuthorized()', () => {
           `EDITOR should be authorized for: ${action}`,
         ).toBe(true);
       }
+    });
+
+    describe('AI_WRITER role', () => {
+      it('is not authorized for any admin action', () => {
+        for (const action of ALL_ACTIONS) {
+          expect(isAuthorized('AI_WRITER', action)).toBe(false);
+        }
+      });
     });
 
     it('is NOT authorized for denied actions', () => {

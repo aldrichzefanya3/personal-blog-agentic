@@ -16,7 +16,7 @@ export function generateAnonymousDisplayName(): string {
  */
 export async function getUserById(id: string): Promise<User | null> {
   const rows = await sql<User[]>`
-    SELECT id, role, display_name, bio, avatar_url, created_at
+    SELECT id, role, display_name, bio, avatar_url, created_at, ai_writer_enabled
     FROM public.users
     WHERE id = ${id}
   `;
@@ -29,7 +29,7 @@ export async function getUserById(id: string): Promise<User | null> {
  */
 export async function getAllUsers(): Promise<User[]> {
   const rows = await sql<User[]>`
-    SELECT id, role, display_name, bio, avatar_url, created_at
+    SELECT id, role, display_name, bio, avatar_url, created_at, ai_writer_enabled
     FROM public.users
     ORDER BY created_at ASC
   `;
@@ -52,10 +52,42 @@ export async function updateUserProfile(
       bio          = COALESCE(${data.bio ?? null}, bio),
       avatar_url   = COALESCE(${data.avatar_url ?? null}, avatar_url)
     WHERE id = ${id}
-    RETURNING id, role, display_name, bio, avatar_url, created_at
+    RETURNING id, role, display_name, bio, avatar_url, created_at, ai_writer_enabled
   `;
   if (rows.length === 0) {
     throw new Error(`User not found: ${id}`);
   }
   return rows[0];
+}
+
+export async function updateManagedUserRole(
+  id: string,
+  role: 'EDITOR' | 'AI_WRITER',
+): Promise<User | null> {
+  const rows = await sql<User[]>`
+    UPDATE public.users
+    SET role = ${role},
+        ai_writer_enabled = CASE
+          WHEN ${role} = 'AI_WRITER' THEN ai_writer_enabled
+          ELSE FALSE
+        END
+    WHERE id = ${id}
+      AND role <> 'ADMIN'
+    RETURNING id, role, display_name, bio, avatar_url, created_at, ai_writer_enabled
+  `;
+  return rows[0] ?? null;
+}
+
+export async function setAiWriterEnabled(
+  id: string,
+  enabled: boolean,
+): Promise<User | null> {
+  const rows = await sql<User[]>`
+    UPDATE public.users
+    SET ai_writer_enabled = ${enabled}
+    WHERE id = ${id}
+      AND role = 'AI_WRITER'
+    RETURNING id, role, display_name, bio, avatar_url, created_at, ai_writer_enabled
+  `;
+  return rows[0] ?? null;
 }

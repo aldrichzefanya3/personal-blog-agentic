@@ -2,7 +2,7 @@
 // Core database row types derived from the PostgreSQL schema (Requirements 6.1–6.7)
 
 export type PostStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-export type UserRole = 'ADMIN' | 'EDITOR';
+export type UserRole = 'ADMIN' | 'EDITOR' | 'AI_WRITER';
 
 export interface Post {
   id: string; // UUID
@@ -15,6 +15,10 @@ export interface Post {
   status: PostStatus;
   published_at: string | null; // ISO 8601
   created_at: string;
+  ai_generated: boolean;
+  ai_review_status: 'not_applicable' | 'pending' | 'approved' | 'rejected';
+  ai_meta_description: string | null;
+  ai_image_prompt: string | null;
   updated_at: string;
 }
 
@@ -29,6 +33,7 @@ export interface Category {
   name: string;
   slug: string;
   created_at: string;
+  auto_publish?: boolean;
 }
 
 export interface Tag {
@@ -45,6 +50,7 @@ export interface User {
   bio: string | null;
   avatar_url: string | null;
   created_at: string;
+  ai_writer_enabled: boolean;
 }
 
 export interface Media {
@@ -100,6 +106,7 @@ export interface CreateCategoryInput {
 export interface UpdateCategoryInput {
   name?: string;
   slug?: string;
+  auto_publish?: boolean;
 }
 
 export interface CreateTagInput {
