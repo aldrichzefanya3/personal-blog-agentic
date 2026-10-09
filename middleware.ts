@@ -64,7 +64,7 @@ export async function middleware(request: NextRequest) {
     //   - The response sends Set-Cookie headers to persist the new tokens
     const supabase = createServerClient(
       process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_ANON_KEY!,
       {
         cookies: {
           getAll() {
