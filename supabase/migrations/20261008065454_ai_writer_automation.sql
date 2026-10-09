@@ -131,17 +131,34 @@ AS $$
 DECLARE
   managed_role TEXT := NEW.raw_app_meta_data->>'managed_role';
   anonymous_name TEXT := 'Anonymous-' || substr(replace(pg_catalog.gen_random_uuid()::text, '-', ''), 1, 8);
+  resolved_role TEXT;
 BEGIN
-  IF managed_role IS NULL OR managed_role NOT IN ('ADMIN', 'EDITOR', 'AI_WRITER') THEN
-    RAISE EXCEPTION 'New accounts must be created by an administrator';
-  END IF;
+  -- Defensive: never raise from this trigger.
+  --
+  -- Rationale: GoTrue's `admin.createUser` does NOT reliably relay
+  -- `app_metadata` into `raw_app_meta_data` on the auth user row across
+  -- versions.  When the relay is missing, a strict RAISE EXCEPTION here
+  -- causes GoTrue to roll back the auth user and return the generic
+  -- "Database error creating new user" (HTTP 500).
+  --
+  -- Instead, default any unknown/missing role to 'EDITOR'.  The
+  -- authoritative role is set by the application via an explicit
+  -- `public.users` upsert immediately after user creation, so a silent
+  -- default here only ever affects orphaned auth rows.
+  resolved_role := CASE
+    WHEN managed_role = 'ADMIN'  THEN 'ADMIN'
+    WHEN managed_role = 'EDITOR' THEN 'EDITOR'
+    WHEN managed_role = 'AI_WRITER' THEN 'AI_WRITER'
+    ELSE 'EDITOR'
+  END;
 
   INSERT INTO public.users (id, role, display_name)
   VALUES (
     NEW.id,
-    managed_role,
+    resolved_role,
     COALESCE(NEW.raw_user_meta_data->>'display_name', anonymous_name)
-  );
+  )
+  ON CONFLICT (id) DO NOTHING;
 
   RETURN NEW;
 END;

@@ -38,6 +38,12 @@ import { NextResponse, type NextRequest } from 'next/server';
  * Runs on every request matching the `matcher` config (see bottom of file).
  * The response object is created immediately so that any cookie mutations
  * performed by the Supabase client can be propagated to the browser.
+ *
+ * Performance note: `supabase.auth.getUser()` performs a network round-trip to
+ * Supabase's auth API on every call.  To keep non-admin requests fast, we only
+ * invoke it when the request actually needs an authenticated session — i.e.
+ * for `/admin/**` routes.  Public routes skip the call entirely and proceed
+ * directly to security-header injection.
  */
 export async function middleware(request: NextRequest) {
   // Create the response object early so we can mutate cookies/headers
@@ -46,48 +52,44 @@ export async function middleware(request: NextRequest) {
   });
 
   // =========================================================================
-  // 1. Session Refresh (Req 8.9)
-  // =========================================================================
-  //
-  // Create a Supabase client configured for middleware.  The cookie handlers
-  // read from the request and write to both the request and response so that:
-  //   - The request sees updated cookies if the token is refreshed mid-request
-  //   - The response sends Set-Cookie headers to persist the new tokens
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            // Update the request so downstream code sees the new cookie
-            request.cookies.set(name, value);
-            // Update the response so the browser receives the Set-Cookie header
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    },
-  );
-
-  // Call getUser() to trigger a session refresh if the access token is expired.
-  // The Supabase client transparently exchanges the refresh token for a new
-  // access token and writes the updated tokens to cookies via setAll above.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // =========================================================================
   // 2. Authentication Guard for /admin/** (Req 8.8)
   // =========================================================================
   //
-  // If the request is for an admin route and there is no authenticated user,
-  // redirect to the login page with a `redirectTo` query parameter so the user
-  // can return to their original destination after signing in.
+  // If the request is for an admin route, we need an authenticated user.
+  // Only then do we pay the cost of the Supabase auth round-trip.
   if (request.nextUrl.pathname.startsWith('/admin')) {
+    // Create a Supabase client configured for middleware.  The cookie handlers
+    // read from the request and write to both the request and response so that:
+    //   - The request sees updated cookies if the token is refreshed mid-request
+    //   - The response sends Set-Cookie headers to persist the new tokens
+    const supabase = createServerClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              // Update the request so downstream code sees the new cookie
+              request.cookies.set(name, value);
+              // Update the response so the browser receives the Set-Cookie header
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      },
+    );
+
+    // Call getUser() to trigger a session refresh if the access token is
+    // expired.  The Supabase client transparently exchanges the refresh token
+    // for a new access token and writes the updated tokens to cookies via
+    // setAll above.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       const redirectUrl = new URL('/auth/login', request.url);
       redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname);

@@ -2,7 +2,7 @@
 // Property-based tests for CP-1: Slug Idempotence
 // **Validates: Requirements 3.9, 11.1, 12.1, 12.2**
 
-import { describe, it, expect } from 'vitest';
+import { describe, it } from 'vitest';
 import * as fc from 'fast-check';
 import { generateSlug } from '@/lib/slug';
 

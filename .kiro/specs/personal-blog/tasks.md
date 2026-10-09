@@ -543,14 +543,14 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
     - Test `ensureUniqueSlug`: returns base slug if no conflict, appends `-2` on first conflict, increments correctly, throws after `-999`
     - _Requirements: 18.1_
 
-  - [ ] 22.2 Write property-based test CP-1 (Slug Idempotence)
+  - [x] 22.2 Write property-based test CP-1 (Slug Idempotence)
     - Create `src/test/property/slug.property.test.ts`
     - Use `fast-check` `fc.string()` arbitrary; assert `generateSlug(generateSlug(title)) === generateSlug(title)` for 1000 runs
     - **Property 1: Slug Idempotence**
     - **Validates: Requirements 3.9, 11.1, 12.1, 12.2**
     - _Requirements: 18.6_
 
-  - [ ] 22.3 Write property-based test CP-2 (Slug Character Invariant)
+  - [x] 22.3 Write property-based test CP-2 (Slug Character Invariant)
     - In `src/test/property/slug.property.test.ts` (same file as CP-1)
     - Use `fc.string({ minLength: 1 })`; when slug is non-empty assert it matches `/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/` and does not contain `--`
     - **Property 2: Slug Character Invariant**
@@ -562,7 +562,7 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
     - Test that `renderMarkdown` strips `<script>alert(1)</script>`, `<img onerror="x">`, `<a href="javascript:alert(1)">`, `onload=`, `data:text/html` payloads from rendered output (Req 18.1)
     - _Requirements: 18.1_
 
-  - [ ] 22.5 Write property-based test CP-3 (Sanitization XSS Safety Invariant)
+  - [x] 22.5 Write property-based test CP-3 (Sanitization XSS Safety Invariant)
     - Create `src/test/property/sanitizer.property.test.ts`
     - Use `fc.string()` arbitrary; for any input assert the rendered HTML does not match `/<script/i`, `/\son\w+=/i`, `/javascript:/i`, `/data:text\/html/i`
     - **Property 3: Markdown Sanitization — XSS Safety Invariant**
@@ -575,7 +575,7 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
     - Create `src/test/unit/validation/media.test.ts`: boundary tests — 10_485_760 bytes passes, 10_485_761 fails; allowed MIME types pass, unsupported MIME fails
     - _Requirements: 18.1_
 
-  - [ ] 22.7 Write property-based test CP-4 (Zod Validator — Invalid Input Rejection)
+  - [x] 22.7 Write property-based test CP-4 (Zod Validator — Invalid Input Rejection)
     - Create `src/test/property/validation.property.test.ts`
     - For `CreatePostSchema`: use `fc.stringMatching(/^\s*$/)` for title; assert `safeParse().success === false` with a `title` field issue (1000 runs)
     - For `MediaUploadSchema`: use `fc.integer({ min: 10_485_761 })` for `size_bytes`; assert rejection (1000 runs)
@@ -583,7 +583,7 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
     - **Validates: Requirements 11.9, 11.11, 13.1, 13.2, 14.1, 14.2**
     - _Requirements: 18.6_
 
-  - [ ] 22.8 Write property-based test CP-5 (Zod Validator — Valid Input Round-Trip)
+  - [x] 22.8 Write property-based test CP-5 (Zod Validator — Valid Input Round-Trip)
     - In `src/test/property/validation.property.test.ts` (same file as CP-4)
     - Use `fc.record({ title: fc.string(...).filter(...), content: fc.string(...).filter(...) })`; for inputs that pass `safeParse`, verify JSON round-trip produces deeply equal result (500 runs)
     - **Property 5: Zod Validator — Valid Input Round-Trip**
@@ -598,7 +598,7 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
     - Assert `isAuthorized('EDITOR', 'post:create')`, `'category:write'`, `'media:upload'` are all `true`
     - _Requirements: 18.1_
 
-  - [ ] 22.10 Write property-based test CP-6 (RBAC Role Permission Invariant)
+  - [x] 22.10 Write property-based test CP-6 (RBAC Role Permission Invariant)
     - Create `src/test/property/rbac.property.test.ts`
     - Use `fc.constantFrom(...allActions)` arbitrary; assert USER returns false for all, EDITOR returns false for ADMIN-only actions
     - **Property 6: RBAC — Role Permission Invariant**
@@ -610,28 +610,28 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
 ### 23. Testing — Property-Based Tests (Remaining Properties)
 
 - [ ] 23. Write remaining property-based tests
-  - [ ] 23.1 Write property-based test CP-7 (Post Status Transition Invariants)
+  - [x] 23.1 Write property-based test CP-7 (Post Status Transition Invariants)
     - Create `src/test/property/posts.property.test.ts`
     - Generate arbitrary Post-like objects; apply `publishPost`, `unpublishPost`, `archivePost` transition logic (extract pure transition functions from service layer); assert post-conditions for each transition
     - **Property 7: Post Status Transition Invariants**
     - **Validates: Requirements 11.3, 11.4, 11.5**
     - _Requirements: 18.6_
 
-  - [ ] 23.2 Write property-based test CP-8 (Pagination Completeness Invariant)
+  - [x] 23.2 Write property-based test CP-8 (Pagination Completeness Invariant)
     - In `src/test/property/posts.property.test.ts` (same file as CP-7)
     - Generate `fc.integer({ min: 0, max: 500 })` for N and `fc.integer({ min: 1, max: 50 })` for P; verify sum of page record counts equals N, each page ≤ P records, no duplicate IDs (using the pure pagination logic from the query layer)
     - **Property 8: Pagination Completeness Invariant**
     - **Validates: Requirements 1.1, 1.5, 1.6**
     - _Requirements: 18.6_
 
-  - [ ] 23.3 Write property-based test CP-9 (Parameterized Query — No SQL Injection)
+  - [x] 23.3 Write property-based test CP-9 (Parameterized Query — No SQL Injection)
     - Create `src/test/property/query-layer.property.test.ts`
     - Use `fc.string()` containing SQL metacharacters; pass as search query parameter to `searchPosts` against a test DB (or mock); assert the query executes without DB syntax error and returns only data rows (not structural changes)
     - **Property 9: Parameterized Query — No SQL Injection**
     - **Validates: Requirements 16.1, 16.2**
     - _Requirements: 18.6_
 
-  - [ ] 23.4 Write property-based test CP-10 (Media Upload Validation — Boundary Invariant)
+  - [x] 23.4 Write property-based test CP-10 (Media Upload Validation — Boundary Invariant)
     - In `src/test/property/validation.property.test.ts` (same file as CP-4/CP-5)
     - Assert `MediaUploadSchema.safeParse({ size_bytes: N, mime_type: M })` fails for any `N > 10_485_760` or disallowed MIME; passes for all valid combinations
     - **Property 10: Media Upload Validation — Boundary Invariant**
@@ -643,7 +643,7 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
 ### 24. Testing — Integration Tests
 
 - [ ] 24. Write integration tests for auth, RBAC, and post CRUD
-  - [ ] 24.1 Write authentication integration tests
+  - [x] 24.1 Write authentication integration tests
     - Create `src/test/integration/auth.test.ts`
     - Test: unauthenticated GET `/admin` returns HTTP 307 redirect with `location` containing `/auth/login` (Req 18.2)
     - Test: authenticated request with valid session to `/admin` returns HTTP 200 (Req 18.2)
@@ -651,14 +651,14 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
     - Use MSW to mock Supabase Auth responses
     - _Requirements: 18.2_
 
-  - [ ] 24.2 Write RBAC enforcement integration tests
+  - [x] 24.2 Write RBAC enforcement integration tests
     - Create `src/test/integration/rbac.test.ts`
     - Test: EDITOR session requesting `/admin/settings` returns HTTP 403 (Req 18.2, 18.5)
     - Test: USER role requesting any `/admin/**` route returns HTTP 403 within 500ms (Req 9.4)
     - Test: unauthenticated request to role-required route returns HTTP 401 (Req 9.8)
     - _Requirements: 9.4, 9.8, 18.2, 18.5_
 
-  - [ ] 24.3 Write post CRUD lifecycle integration tests
+  - [x] 24.3 Write post CRUD lifecycle integration tests
     - Create `src/test/integration/posts-crud.test.ts`
     - Test create draft: HTTP 201, `status = 'DRAFT'` (Req 18.3)
     - Test update: HTTP 200, `updated_at` is later than before update (Req 18.3)
@@ -669,7 +669,7 @@ The design document uses TypeScript throughout; all code tasks use TypeScript.
     - Test unauthenticated GET to draft post's public URL returns HTTP 404 (Req 18.4)
     - _Requirements: 18.3, 18.4_
 
-  - [ ] 24.4 Write media upload/delete integration tests
+  - [x] 24.4 Write media upload/delete integration tests
     - Create `src/test/integration/media.test.ts`
     - Test: upload with valid MIME and size → HTTP 200, media record exists, URL returned (Req 13.4)
     - Test: upload with invalid MIME → HTTP 400 with field-level error (Req 13.3)

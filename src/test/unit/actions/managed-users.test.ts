@@ -15,6 +15,7 @@ vi.mock('@/lib/db/queries/users', () => ({
   setAiWriterEnabled: vi.fn(),
   updateManagedUserRole: vi.fn(),
   updateUserProfile: vi.fn(),
+  upsertManagedUser: vi.fn(),
 }));
 
 vi.mock('@/lib/auth/session', () => ({
@@ -47,6 +48,7 @@ import {
   setAiWriterEnabled,
   updateManagedUserRole,
   updateUserProfile,
+  upsertManagedUser,
 } from '@/lib/db/queries/users';
 import { getServerSession } from '@/lib/auth/session';
 import { AuthError } from '@/lib/errors';
@@ -55,6 +57,30 @@ const mockCreateClient = vi.mocked(createClient);
 const mockRequireRole = vi.mocked(requireRole);
 const mockGetUserById = vi.mocked(getUserById);
 const mockUpdateUserProfile = vi.mocked(updateUserProfile);
+const mockUpsertManagedUser = vi.mocked(upsertManagedUser);
+
+function mockSupabaseCreateUser(userId: string) {
+  const createUser = vi.fn().mockResolvedValue({
+    data: { user: { id: userId } },
+    error: null,
+  });
+  mockCreateClient.mockReturnValue({
+    auth: { admin: { createUser } },
+  } as never);
+  return createUser;
+}
+
+function mockUpsert(role: 'EDITOR' | 'AI_WRITER', displayName = 'Anonymous-deadbeef') {
+  mockUpsertManagedUser.mockResolvedValue({
+    id: 'new-user-789',
+    role,
+    display_name: displayName,
+    bio: null,
+    avatar_url: null,
+    created_at: '2024-01-01T00:00:00Z',
+    ai_writer_enabled: false,
+  } as never);
+}
 
 describe('managed user actions', () => {
   beforeEach(() => {
@@ -81,13 +107,8 @@ describe('managed user actions', () => {
       id: 'admin-456',
       role: 'ADMIN',
     } as never);
-    const createUser = vi.fn().mockResolvedValue({
-      data: { user: { id: 'new-user-789' } },
-      error: null,
-    });
-    mockCreateClient.mockReturnValue({
-      auth: { admin: { createUser } },
-    } as never);
+    const createUser = mockSupabaseCreateUser('new-user-789');
+    mockUpsert('EDITOR');
 
     const result = await createManagedUser(' New@Example.com ');
 
@@ -109,6 +130,11 @@ describe('managed user actions', () => {
         user_metadata: { display_name: 'Anonymous-deadbeef' },
       }),
     );
+    expect(mockUpsertManagedUser).toHaveBeenCalledWith(
+      'new-user-789',
+      'EDITOR',
+      'Anonymous-deadbeef',
+    );
     expect(mockRequireRole).toHaveBeenCalledWith('user:manage');
   });
 
@@ -122,6 +148,7 @@ describe('managed user actions', () => {
       error: 'Insufficient permissions',
     });
     expect(mockCreateClient).not.toHaveBeenCalled();
+    expect(mockUpsertManagedUser).not.toHaveBeenCalled();
   });
 
   it('lets an ADMIN create a paused AI_WRITER account', async () => {
@@ -131,13 +158,8 @@ describe('managed user actions', () => {
       id: 'admin-456',
       role: 'ADMIN',
     } as never);
-    const createUser = vi.fn().mockResolvedValue({
-      data: { user: { id: 'ai-writer-789' } },
-      error: null,
-    });
-    mockCreateClient.mockReturnValue({
-      auth: { admin: { createUser } },
-    } as never);
+    const createUser = mockSupabaseCreateUser('ai-writer-789');
+    mockUpsert('AI_WRITER');
 
     const result = await createManagedUser('writer@example.com', 'AI_WRITER');
 
@@ -150,6 +172,11 @@ describe('managed user actions', () => {
       expect.objectContaining({
         app_metadata: { managed_role: 'AI_WRITER' },
       }),
+    );
+    expect(mockUpsertManagedUser).toHaveBeenCalledWith(
+      'ai-writer-789',
+      'AI_WRITER',
+      'Anonymous-deadbeef',
     );
   });
 
