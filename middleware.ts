@@ -7,6 +7,9 @@ export async function middleware(request: NextRequest) {
   });
 
   // Authentication Guard for /admin/**
+  // Uses getSession() (local JWT read, ~0ms) instead of getUser() (network
+  // round-trip to Supabase Auth) for low-latency middleware checks.
+  // Defense-in-depth: the admin layout independently calls getUser() server-side.
   if (request.nextUrl.pathname.startsWith('/admin')) {
     const supabase = createServerClient(
       process.env.SUPABASE_URL!,
@@ -26,16 +29,11 @@ export async function middleware(request: NextRequest) {
       },
     );
 
-    // OPTIMIZATION: Use getSession() instead of getUser() in middleware if you 
-    // want to avoid a network round-trip on every single request. 
-    // Note: getSession() reads from the local JWT cookie, whereas getUser() validates 
-    // with the Auth server. If you need strict server-side validation on every page,
-    // keep getUser(), but ensure your matcher excludes internal requests.
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    if (!user) {
+    if (!session) {
       const redirectUrl = new URL('/auth/login', request.url);
       redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
       return NextResponse.redirect(redirectUrl);
@@ -45,7 +43,7 @@ export async function middleware(request: NextRequest) {
   // Security Headers
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   response.headers.set('x-nonce', nonce);
-  response.headers.set('Content-Security-Policy', buildCSP(nonce));
+  response.headers.set('Content-Security-Policy', buildCSP());
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -54,11 +52,13 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-function buildCSP(nonce: string): string {
+function buildCSP(): string {
   const directives = [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-    `style-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
+    // 'unsafe-inline' needed for the theme-toggle inline script in the root layout.
+    // 'strict-dynamic' allows trusted scripts to load further scripts.
+    `script-src 'self' 'unsafe-inline' 'strict-dynamic'`,
+    `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: https:`,
     `font-src 'self' data:`,
     `connect-src 'self' https://*.supabase.co`,

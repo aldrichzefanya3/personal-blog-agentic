@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -18,8 +17,7 @@ export const metadata: Metadata = {
   description: 'A personal blog platform built with Next.js',
 };
 
-export default async function RootLayout({ children }: LayoutProps<'/'>) {
-  const nonce = (await headers()).get('x-nonce') ?? undefined;
+export default function RootLayout({ children }: LayoutProps<'/'>) {
 
   return (
     <html
@@ -29,7 +27,6 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
     >
       <head>
         <script
-          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: "(()=>{try{const t=localStorage.getItem('theme');const d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);document.documentElement.classList.toggle('light',!d)}catch{}})()",
           }}
