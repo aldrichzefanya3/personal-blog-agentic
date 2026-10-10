@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export function SearchBar() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [query, setQuery] = React.useState(() => searchParams.get('q') || '');
+  const [query, setQuery] = React.useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const trimmedQuery = query.trim();
 
     if (!trimmedQuery) {
@@ -24,6 +24,7 @@ export function SearchBar() {
       <label htmlFor="search-input" className="sr-only">
         Search posts
       </label>
+
       <input
         id="search-input"
         type="search"
@@ -33,6 +34,7 @@ export function SearchBar() {
         className="w-full rounded-full border border-slate-200 bg-slate-50/80 py-2.5 pr-4 pl-10 text-sm text-slate-700 shadow-sm transition duration-200 placeholder:text-slate-400 focus:border-cyan-400 focus:bg-white focus:ring-4 focus:ring-cyan-100 focus:outline-none dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-cyan-400 dark:focus:bg-slate-900 dark:focus:ring-cyan-500/20"
         aria-label="Search posts"
       />
+
       <svg
         className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
         fill="none"

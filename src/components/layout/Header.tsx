@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchBar } from './SearchBar';
@@ -21,13 +22,16 @@ export function Header() {
                   My Blog
                 </span>
                 <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
-                  Notes & ideas
+                  Notes &amp; ideas
                 </span>
               </span>
             </Link>
           </div>
 
-          <nav aria-label="Main navigation" className="hidden items-center md:flex">
+          <nav
+            aria-label="Main navigation"
+            className="hidden items-center md:flex"
+          >
             <ul className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50/80 p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
               <li>
                 <Link
@@ -50,7 +54,13 @@ export function Header() {
 
           <div className="flex w-full items-center gap-2 sm:gap-3 md:ml-auto md:w-auto">
             <div className="min-w-0 flex-1 md:w-52 md:flex-none lg:w-72">
-              <SearchBar />
+              <Suspense
+                fallback={
+                  <div className="h-10 w-full rounded-full bg-slate-100 dark:bg-slate-800" />
+                }
+              >
+                <SearchBar />
+              </Suspense>
             </div>
             <ThemeToggle />
           </div>
