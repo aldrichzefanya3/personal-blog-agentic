@@ -7,6 +7,7 @@
  *     from client-supplied values or JWT claims.
  */
 
+import { cache } from 'react';
 import { createSupabaseServerClient } from '@/lib/auth/supabase-server';
 
 import { getUserById } from '@/lib/db/queries/users';
@@ -56,7 +57,7 @@ export type ServerSession = SessionUser;
  * This function is safe to call from Server Components, Route Handlers, and
  * Server Functions (middleware). It is intentionally async.
  */
-export async function getServerSession(): Promise<SessionUser | null> {
+export const getServerSession = cache(async function getServerSession(): Promise<SessionUser | null> {
   const supabase = await createSupabaseServerClient();
 
   // Step 2: verify the session token against Supabase Auth.
@@ -88,4 +89,4 @@ export async function getServerSession(): Promise<SessionUser | null> {
     avatar_url: dbUser.avatar_url,
     created_at: dbUser.created_at,
   };
-}
+});

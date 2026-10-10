@@ -12,6 +12,12 @@
  * mount to generate the CSRF token via a Server Action. This is necessary because
  * Server Components cannot modify cookies during render in Next.js 15+.
  *
+ * SPA-like Navigation: The NavigationProgress bar provides instant visual
+ * feedback on link clicks. The client-side router cache (staleTimes in
+ * next.config.ts) keeps RSC payloads for 30 s so revisiting a page doesn't
+ * hit the server again. loading.tsx files in each sub-route provide skeleton
+ * UIs so the layout shell is always shown immediately.
+ *
  * Requirements: 8.9, 9.4, 10.3, 15.6
  *
  * Req 8.9  — Session verified server-side before rendering admin content
@@ -24,6 +30,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from '@/lib/auth/session';
 import { Sidebar } from '@/components/admin/Sidebar';
 import { CsrfTokenInitializer } from '@/components/admin/CsrfTokenInitializer';
+import { NavigationProgress } from '@/components/admin/NavigationProgress';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -66,6 +73,8 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   // Note: CSRF token is initialized by CsrfTokenInitializer client component
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950 lg:flex-row">
+      {/* SPA-like navigation progress indicator */}
+      <NavigationProgress />
       <CsrfTokenInitializer />
       <Sidebar role={session.role} />
       <main className="flex-1 p-4 sm:p-6 lg:p-8">

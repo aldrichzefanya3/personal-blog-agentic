@@ -3,6 +3,7 @@
 
 /* Import Tailwind CSS */
 @import 'tailwindcss';
+@plugin "@tailwindcss/typography";
 
 /* Import Design Tokens (colors, semantic tokens) */
 @import '../styles/design-tokens.css';
@@ -147,4 +148,66 @@
     background: var(--color-primary-800);
     color: var(--color-text);
   }
+}
+
+/* ============================================================
+   PROSE / MARKDOWN RENDERING
+   The global `* { margin: 0; padding: 0 }` reset above strips
+   all spacing that @tailwindcss/typography sets on headings,
+   paragraphs, lists, blockquotes, etc.
+   This block restores those styles inside any .prose container
+   (used by the markdown preview and the public post pages).
+   ============================================================ */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  margin-top: revert;
+  margin-bottom: revert;
+  padding: revert;
+}
+
+.prose p {
+  margin-top: revert;
+  margin-bottom: revert;
+}
+
+.prose ul,
+.prose ol {
+  margin-top: revert;
+  margin-bottom: revert;
+  padding-left: revert;
+}
+
+.prose li {
+  margin-top: revert;
+  margin-bottom: revert;
+}
+
+.prose blockquote {
+  margin-top: revert;
+  margin-bottom: revert;
+  padding-left: revert;
+}
+
+.prose pre {
+  margin-top: revert;
+  margin-bottom: revert;
+}
+
+.prose img {
+  margin-top: revert;
+  margin-bottom: revert;
+}
+
+.prose table {
+  margin-top: revert;
+  margin-bottom: revert;
+}
+
+.prose hr {
+  margin-top: revert;
+  margin-bottom: revert;
 }

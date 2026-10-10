@@ -228,8 +228,8 @@ export default async function PostPage(props: PostPageProps) {
         </div>
 
         <div className="mt-8 grid gap-8 xl:grid-cols-[220px_minmax(0,1fr)]">
-          {tableOfContents.length > 0 && (
-            <aside className="xl:sticky xl:top-24 xl:self-start">
+          <aside className={`xl:sticky xl:top-24 xl:self-start ${tableOfContents.length === 0 ? 'hidden xl:block' : ''}`}>
+            {tableOfContents.length > 0 && (
               <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   Contents
@@ -248,8 +248,8 @@ export default async function PostPage(props: PostPageProps) {
                   ))}
                 </nav>
               </div>
-            </aside>
-          )}
+            )}
+          </aside>
 
           <div className="space-y-8">
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
@@ -279,7 +279,7 @@ export default async function PostPage(props: PostPageProps) {
               )}
 
               <div
-                className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-700 prose-a:text-cyan-700 prose-blockquote:border-cyan-500 prose-blockquote:bg-cyan-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:font-medium prose-code:rounded prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-cyan-700 prose-pre:overflow-x-auto prose-pre:rounded-2xl prose-pre:bg-slate-950 prose-pre:p-4 dark:prose-headings:text-slate-50 dark:prose-p:text-slate-200 dark:prose-a:text-cyan-300 dark:prose-blockquote:bg-slate-800 dark:prose-blockquote:text-slate-100 dark:prose-code:bg-slate-800 dark:prose-code:text-cyan-300 max-sm:prose-base"
+                className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-700 prose-li:text-slate-700 prose-strong:text-slate-900 prose-em:text-slate-700 prose-a:text-cyan-700 prose-blockquote:border-cyan-500 prose-blockquote:bg-cyan-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:font-medium prose-code:rounded prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-cyan-700 prose-pre:overflow-x-auto prose-pre:rounded-2xl prose-pre:bg-slate-950 prose-pre:p-4 dark:prose-headings:text-slate-50 dark:prose-p:text-slate-200 dark:prose-li:text-slate-200 dark:prose-strong:text-slate-100 dark:prose-em:text-slate-200 dark:prose-a:text-cyan-300 dark:prose-blockquote:bg-slate-800 dark:prose-blockquote:text-slate-100 dark:prose-code:bg-slate-800 dark:prose-code:text-cyan-300 dark:prose-hr:border-slate-700 dark:prose-thead:text-slate-300 dark:prose-tbody:text-slate-200 max-sm:prose-base"
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
             </div>

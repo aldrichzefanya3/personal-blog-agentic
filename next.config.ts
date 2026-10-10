@@ -23,26 +23,29 @@ const nextConfig: NextConfig = {
   },
 
   // Image optimization configuration (Req 5.4)
+  // `**` wildcard allows any HTTPS hostname — no per-domain allowlist needed.
+  // Next.js still validates that the URL is a valid image by content-type
+  // during optimization, so arbitrary non-image URLs won't be served as images.
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.supabase.co',
-        pathname: '/storage/v1/object/**',
-      },
-      // Allow example.com for seed data images
-      {
-        protocol: 'https',
-        hostname: 'example.com',
+        hostname: '**',
       },
     ],
   },
 
-  // Server Actions configuration
+  // Server Actions configuration + SPA-like client cache
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
+    },
+    // Client-side router cache: keep dynamic RSC payloads for 30s so navigating
+    // between admin pages doesn't re-fetch from the server (SPA-like feel).
+    staleTimes: {
+      dynamic: 30,
+      static: 300,
     },
   },
 };

@@ -377,6 +377,22 @@ export async function adminSignupAction(formData: FormData) {
     };
   }
 
+  // GoTrue's admin.createUser does not reliably relay app_metadata to the database trigger.
+  // We must explicitly set the authoritative role via an update immediately after creation.
+  const { error: updateRoleError } = await supabaseAdmin
+    .from('users')
+    .update({ role: 'ADMIN' })
+    .eq('id', userData.user.id);
+
+  if (updateRoleError) {
+    // If we can't make them an admin, they are an orphaned EDITOR account.
+    // We must delete the account here so they are not left as an EDITOR.
+    await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
+    return {
+      error: `Account created but failed to assign ADMIN role: ${updateRoleError.message}`,
+    };
+  }
+
   // Success — return message instructing user to sign in
   return {
     success:
