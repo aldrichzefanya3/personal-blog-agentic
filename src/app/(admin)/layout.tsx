@@ -26,6 +26,11 @@
  * Req 15.6 — CSRF token generated and stored in non-HttpOnly cookie
  */
 
+// Force all routes in this group to be dynamically rendered at request time.
+// Without this, Next.js attempts to statically pre-render pages during `next build`,
+// which triggers DB queries that time out (CONNECT_TIMEOUT) in the build environment.
+export const dynamic = 'force-dynamic';
+
 import { redirect } from 'next/navigation';
 import { getServerSession } from '@/lib/auth/session';
 import { Sidebar } from '@/components/admin/Sidebar';

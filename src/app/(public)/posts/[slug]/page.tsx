@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { unstable_cache } from 'next/cache';
 import type { Metadata } from 'next';
-import { getPostBySlug, getAllPostSlugs, getPublishedPosts } from '@/lib/db/queries/posts';
+import { getPostBySlug, getPublishedPosts } from '@/lib/db/queries/posts';
 import { renderMarkdown } from '@/lib/content/markdown';
 import { generatePostMetadata } from '@/lib/seo/metadata';
 import { buildBlogPostingJsonLd, serializeJsonLd } from '@/lib/seo/jsonld';
@@ -12,6 +12,9 @@ import { ReadingProgress } from '@/components/blog/ReadingProgress';
 
 // Enable ISR with 60 second revalidation (Req 5.3)
 export const revalidate = 60;
+
+// Allow slugs not pre-rendered at build time to be rendered on first request
+export const dynamicParams = true;
 
 interface PostPageProps {
   params: Promise<{
@@ -337,13 +340,10 @@ export default async function PostPage(props: PostPageProps) {
 }
 
 /**
- * Generate static params for all published posts (Req 5.1)
- * This enables static generation at build time for all published post slugs
+ * Return an empty list at build time — the DB is not reachable during `next build`.
+ * Posts are rendered on first request then cached via ISR (revalidate = 60).
+ * dynamicParams = true (above) ensures any slug still resolves at runtime.
  */
 export async function generateStaticParams() {
-  const slugs = await getAllPostSlugs();
-
-  return slugs.map((slug) => ({
-    slug,
-  }));
+  return [];
 }

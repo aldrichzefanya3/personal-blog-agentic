@@ -7,8 +7,9 @@ import { Hero } from '@/components/blog/Hero';
 import { generateHomeMetadata } from '@/lib/seo/metadata';
 import type { Metadata } from 'next';
 
-// Enable ISR with 60 second revalidation (Req 5.1, 5.3)
-export const revalidate = 60;
+// Force dynamic rendering — this page reads searchParams and makes DB calls.
+// ISR is not compatible with searchParams; use force-dynamic to render on each request.
+export const dynamic = 'force-dynamic';
 
 interface HomePageProps {
   searchParams: Promise<{ page?: string }>;

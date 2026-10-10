@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8000",
+    "dev": "node scripts/setup.js && next dev -p 8000",
     "build": "next build --turbopack",
     "start": "next start -p 8000",
     "lint": "eslint",
@@ -13,8 +13,8 @@
     "db:migrate": "node scripts/migrate.js",
     "db:seed": "node scripts/seed.js",
     "db:setup": "npm run db:migrate && npm run db:seed",
-    "db:verify": "node scripts/verify-db.js",
-    "postinstall": "npm run db:setup || true"
+    "db:setup:once": "node scripts/setup.js",
+    "db:verify": "node scripts/verify-db.js"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

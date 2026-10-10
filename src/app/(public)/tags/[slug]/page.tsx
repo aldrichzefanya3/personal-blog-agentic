@@ -6,8 +6,8 @@ import { Pagination } from '@/components/blog/Pagination';
 import { generateTagMetadata } from '@/lib/seo/metadata';
 import type { Metadata } from 'next';
 
-// Enable ISR with 60 second revalidation (Req 5.1, 5.3)
-export const revalidate = 60;
+// Force dynamic rendering — this page reads searchParams and makes DB calls.
+export const dynamic = 'force-dynamic';
 
 interface TagPageProps {
   params: Promise<{ slug: string }>;
